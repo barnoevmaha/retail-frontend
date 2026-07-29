@@ -21,9 +21,8 @@ Customer-facing e-commerce frontend for the Retail Management System. Built with
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| VITE_API_URL | /api | Backend API base URL |
-
-In production, set this to your backend URL (e.g., https://backend-production.up.railway.app).
+| VITE_API_URL | /api | Backend API base URL (build-time, optional) |
+| BACKEND_URL | — | Backend URL for nginx proxy (runtime, required) |
 
 ## Development
 
@@ -38,18 +37,18 @@ Starts on port 5173 with Vite proxy forwarding /api to localhost:8000.
 ## Production Build
 
 ```bash
-VITE_API_URL=https://your-backend-url npm run build
+VITE_API_URL=https://your-backend-url/api npm run build
 ```
 
 Or via Docker:
 
 ```bash
-docker build --build-arg VITE_API_URL=https://your-backend-url -t retail-frontend .
+docker build --build-arg VITE_API_URL=https://your-backend-url/api -t retail-frontend .
 ```
 
 ## Railway Deployment
 
 1. Push this repo to GitHub
 2. In Railway, create a new project from the repo
-3. Set environment variable: VITE_API_URL
+3. Set environment variables: `BACKEND_URL` (required for nginx proxy) and optionally `VITE_API_URL` (for direct API calls)
 4. Deploy
