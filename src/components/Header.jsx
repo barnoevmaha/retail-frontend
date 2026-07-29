@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
+import { useAuth } from '../context/AuthContext'
 
 export default function Header() {
   const { count } = useCart()
+  const { customer } = useAuth()
 
   return (
     <header className="bg-white shadow-sm border-b">
@@ -18,6 +20,11 @@ export default function Header() {
               </span>
             )}
           </Link>
+          {customer ? (
+            <Link to="/account" className="hover:text-gray-600">{customer.first_name}</Link>
+          ) : (
+            <Link to="/login" className="hover:text-gray-600">Sign In</Link>
+          )}
         </nav>
       </div>
     </header>
