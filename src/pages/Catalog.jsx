@@ -9,8 +9,8 @@ export default function Catalog() {
   const [selectedCat, setSelectedCat] = useState('')
 
   useEffect(() => {
-    api.get('/products/').then((r) => setProducts(r.data)).catch(() => {})
-    api.get('/categories/').then((r) => setCategories(r.data)).catch(() => {})
+    api.get('/products/').then((r) => setProducts(r.data.items || [])).catch(() => {})
+    api.get('/categories/').then((r) => setCategories(r.data || [])).catch(() => {})
   }, [])
 
   const filtered = selectedCat ? products.filter((p) => p.category_id === parseInt(selectedCat)) : products

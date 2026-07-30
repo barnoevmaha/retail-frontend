@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap');
 
 /* ThemeContext toggles the `dark` class on <html>, so tell Tailwind v4
    to key dark: variants off that class instead of prefers-color-scheme.
