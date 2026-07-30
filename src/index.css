@@ -1,9 +1,100 @@
 @import "tailwindcss";
 
+/* ThemeContext toggles the `dark` class on <html>, so tell Tailwind v4
+   to key dark: variants off that class instead of prefers-color-scheme.
+   Remove this if you already define it elsewhere. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ---------------------------------------------------------------------
+   Design tokens
+   Semantic utilities (bg-surface, text-ink, shadow-card, rounded-card,
+   p-card, ...) switch value automatically when .dark toggles — no
+   dark: prefix needed at the call site. Existing gray-900/gray-50/etc.
+   utilities keep working unchanged.
+   ------------------------------------------------------------------- */
+@theme {
+  --color-bg: var(--ui-bg);
+  --color-surface: var(--ui-surface);
+  --color-surface-muted: var(--ui-surface-muted);
+  --color-border: var(--ui-border);
+  --color-ink: var(--ui-ink);
+  --color-ink-muted: var(--ui-ink-muted);
+  --color-accent: var(--ui-accent);
+  --color-accent-ink: var(--ui-accent-ink);
+  --color-accent-hover: var(--ui-accent-hover);
+  --color-danger: var(--ui-danger);
+  --color-danger-bg: var(--ui-danger-bg);
+  --color-success: var(--ui-success);
+  --color-success-bg: var(--ui-success-bg);
+
+  --spacing-gutter: 1rem;     /* page / header horizontal padding */
+  --spacing-card: 1.5rem;     /* card internal padding */
+  --spacing-section: 1.5rem;  /* vertical rhythm between blocks */
+
+  --radius-card: 0.75rem;
+  --shadow-card: var(--ui-shadow-card);
+}
+
+:root {
+  --ui-bg: #f9fafb;            /* gray-50 */
+  --ui-surface: #ffffff;
+  --ui-surface-muted: #f3f4f6; /* gray-100 */
+  --ui-border: #e5e7eb;        /* gray-200 */
+  --ui-ink: #111827;           /* gray-900 */
+  --ui-ink-muted: #6b7280;     /* gray-500 */
+  --ui-accent: #111827;        /* gray-900 */
+  --ui-accent-ink: #ffffff;
+  --ui-accent-hover: #1f2937;  /* gray-800 */
+  --ui-danger: #dc2626;        /* red-600 */
+  --ui-danger-bg: #fee2e2;     /* red-100 */
+  --ui-success: #16a34a;       /* green-600 */
+  --ui-success-bg: #dcfce7;    /* green-100 */
+  --ui-shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.08), 0 1px 2px -1px rgb(0 0 0 / 0.08);
+}
+
+.dark {
+  --ui-bg: #030712;            /* gray-950 */
+  --ui-surface: #111827;       /* gray-900 */
+  --ui-surface-muted: #1f2937; /* gray-800 */
+  --ui-border: #1f2937;        /* gray-800 */
+  --ui-ink: #ffffff;
+  --ui-ink-muted: #9ca3af;     /* gray-400 */
+  --ui-accent: #ffffff;
+  --ui-accent-ink: #111827;
+  --ui-accent-hover: #e5e7eb;  /* gray-200 */
+  --ui-danger: #f87171;        /* red-400 */
+  --ui-danger-bg: rgb(127 29 29 / 0.5);
+  --ui-success: #4ade80;       /* green-400 */
+  --ui-success-bg: rgb(20 83 45 / 0.5);
+  --ui-shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.5), 0 1px 2px -1px rgb(0 0 0 / 0.5);
+}
+
+/* ---------------------------------------------------------------------
+   Base
+   ------------------------------------------------------------------- */
+body {
+  background-color: var(--color-bg);
+  color: var(--color-ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------------------
+   Motion
+   ------------------------------------------------------------------- */
 @keyframes slide-up {
   from { opacity: 0; transform: translateY(16px); }
   to { opacity: 1; transform: translateY(0); }
 }
 .animate-slide-up {
   animation: slide-up 0.3s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-slide-up {
+    animation: none;
+  }
 }
