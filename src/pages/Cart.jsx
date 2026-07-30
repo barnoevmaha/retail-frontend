@@ -29,26 +29,26 @@ export default function Cart() {
 
   return (
     <div className="max-w-3xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6 dark:text-white">{t('cart.title')}</h1>
+      <h1 className="text-2xl font-bold mb-6 text-ink">{t('cart.title')}</h1>
       {items.length === 0 ? (
-        <p className="text-gray-500 dark:text-gray-400">{t('cart.empty')}</p>
+        <p className="text-ink-muted">{t('cart.empty')}</p>
       ) : (
         <>
           {items.map((item) => (
-            <div key={item.id} className="bg-white dark:bg-gray-900 rounded-lg shadow dark:shadow-gray-900/50 p-4 mb-3 flex justify-between items-center">
-              <div className="dark:text-gray-300">
-                <p className="font-medium dark:text-white">{item.product_name}</p>
-                <p className="text-sm text-gray-500 dark:text-gray-400">{t('cart.quantity').replace('{qty}', item.quantity)}</p>
+            <div key={item.id} className="bg-surface border border-border rounded-card shadow-card p-4 mb-3 flex justify-between items-center">
+              <div className="text-ink-muted">
+                <p className="font-medium text-ink">{item.product_name}</p>
+                <p className="text-sm text-ink-muted">{t('cart.quantity').replace('{qty}', item.quantity)}</p>
               </div>
               <div className="flex items-center gap-4">
-                <span className="font-medium dark:text-white">${item.price}</span>
-                <button onClick={() => remove(item.id)} className="text-red-500 text-sm hover:text-red-700">{t('cart.remove')}</button>
+                <span className="font-medium text-ink">${item.price}</span>
+                <button onClick={() => remove(item.id)} className="text-danger text-sm font-medium hover:opacity-75 transition-opacity">{t('cart.remove')}</button>
               </div>
             </div>
           ))}
           <div className="text-right mt-4">
-            <p className="text-xl font-bold dark:text-white">{t('cart.total').replace('{total}', total.toFixed(2))}</p>
-            <button className="bg-gray-900 dark:bg-white dark:text-gray-900 text-white px-6 py-2 rounded mt-2 hover:bg-gray-800 dark:hover:bg-gray-200">{t('cart.checkout')}</button>
+            <p className="text-xl font-display font-bold text-ink">{t('cart.total').replace('{total}', total.toFixed(2))}</p>
+            <button className="bg-accent text-accent-ink px-6 py-2.5 rounded-control font-medium mt-2 hover:bg-accent-hover transition-colors">{t('cart.checkout')}</button>
           </div>
         </>
       )}

@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap');
 
 /* ThemeContext toggles the `dark` class on <html>, so tell Tailwind v4
    to key dark: variants off that class instead of prefers-color-scheme.
@@ -8,11 +9,13 @@
 /* ---------------------------------------------------------------------
    Design tokens
    Semantic utilities (bg-surface, text-ink, shadow-card, rounded-card,
-   p-card, ...) switch value automatically when .dark toggles — no
-   dark: prefix needed at the call site. Existing gray-900/gray-50/etc.
-   utilities keep working unchanged.
+   p-card, font-display, ...) switch value automatically when .dark
+   toggles — no dark: prefix needed at the call site.
    ------------------------------------------------------------------- */
 @theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", "Inter", ui-sans-serif, system-ui, sans-serif;
+
   --color-bg: var(--ui-bg);
   --color-surface: var(--ui-surface);
   --color-surface-muted: var(--ui-surface-muted);
@@ -31,42 +34,46 @@
   --spacing-card: 1.5rem;     /* card internal padding */
   --spacing-section: 1.5rem;  /* vertical rhythm between blocks */
 
-  --radius-card: 0.75rem;
+  --radius-card: 1rem;
+  --radius-control: 0.625rem; /* buttons, inputs, chips */
   --shadow-card: var(--ui-shadow-card);
+  --shadow-card-hover: var(--ui-shadow-card-hover);
 }
 
 :root {
-  --ui-bg: #f9fafb;            /* gray-50 */
+  --ui-bg: #f8fafc;
   --ui-surface: #ffffff;
-  --ui-surface-muted: #f3f4f6; /* gray-100 */
-  --ui-border: #e5e7eb;        /* gray-200 */
-  --ui-ink: #111827;           /* gray-900 */
-  --ui-ink-muted: #6b7280;     /* gray-500 */
-  --ui-accent: #111827;        /* gray-900 */
+  --ui-surface-muted: #f1f5f9;
+  --ui-border: #e2e8f0;
+  --ui-ink: #0f172a;
+  --ui-ink-muted: #64748b;
+  --ui-accent: #4f46e5;
   --ui-accent-ink: #ffffff;
-  --ui-accent-hover: #1f2937;  /* gray-800 */
-  --ui-danger: #dc2626;        /* red-600 */
-  --ui-danger-bg: #fee2e2;     /* red-100 */
-  --ui-success: #16a34a;       /* green-600 */
-  --ui-success-bg: #dcfce7;    /* green-100 */
-  --ui-shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.08), 0 1px 2px -1px rgb(0 0 0 / 0.08);
+  --ui-accent-hover: #4338ca;
+  --ui-danger: #dc2626;
+  --ui-danger-bg: #fee2e2;
+  --ui-success: #16a34a;
+  --ui-success-bg: #dcfce7;
+  --ui-shadow-card: 0 1px 2px 0 rgb(15 23 42 / 0.06), 0 1px 3px 0 rgb(15 23 42 / 0.08);
+  --ui-shadow-card-hover: 0 8px 16px -4px rgb(15 23 42 / 0.12), 0 2px 4px -2px rgb(15 23 42 / 0.08);
 }
 
 .dark {
-  --ui-bg: #030712;            /* gray-950 */
-  --ui-surface: #111827;       /* gray-900 */
-  --ui-surface-muted: #1f2937; /* gray-800 */
-  --ui-border: #1f2937;        /* gray-800 */
-  --ui-ink: #ffffff;
-  --ui-ink-muted: #9ca3af;     /* gray-400 */
-  --ui-accent: #ffffff;
-  --ui-accent-ink: #111827;
-  --ui-accent-hover: #e5e7eb;  /* gray-200 */
-  --ui-danger: #f87171;        /* red-400 */
-  --ui-danger-bg: rgb(127 29 29 / 0.5);
-  --ui-success: #4ade80;       /* green-400 */
-  --ui-success-bg: rgb(20 83 45 / 0.5);
-  --ui-shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.5), 0 1px 2px -1px rgb(0 0 0 / 0.5);
+  --ui-bg: #0b0f19;
+  --ui-surface: #131826;
+  --ui-surface-muted: #1c2333;
+  --ui-border: #232b3d;
+  --ui-ink: #f8fafc;
+  --ui-ink-muted: #94a3b8;
+  --ui-accent: #818cf8;
+  --ui-accent-ink: #0b0f19;
+  --ui-accent-hover: #a5b4fc;
+  --ui-danger: #f87171;
+  --ui-danger-bg: rgb(127 29 29 / 0.35);
+  --ui-success: #4ade80;
+  --ui-success-bg: rgb(20 83 45 / 0.35);
+  --ui-shadow-card: 0 1px 2px 0 rgb(0 0 0 / 0.4), 0 1px 3px 0 rgb(0 0 0 / 0.3);
+  --ui-shadow-card-hover: 0 10px 20px -6px rgb(0 0 0 / 0.55);
 }
 
 /* ---------------------------------------------------------------------
@@ -75,6 +82,12 @@
 body {
   background-color: var(--color-bg);
   color: var(--color-ink);
+  font-family: var(--font-sans);
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
 }
 
 :focus-visible {

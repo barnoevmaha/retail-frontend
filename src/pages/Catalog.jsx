@@ -17,18 +17,18 @@ export default function Catalog() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6 dark:text-white">{t('catalog.title')}</h1>
+      <h1 className="text-2xl font-bold mb-6 text-ink">{t('catalog.title')}</h1>
       <div className="flex gap-2 mb-6 flex-wrap">
-        <button onClick={() => setSelectedCat('')} className={`px-3 py-1 rounded text-sm ${!selectedCat ? 'bg-gray-900 dark:bg-white dark:text-gray-900 text-white' : 'bg-gray-100 dark:bg-gray-800 dark:text-gray-300'}`}>{t('catalog.all')}</button>
+        <button onClick={() => setSelectedCat('')} className={`px-3 py-1 rounded-control text-sm transition-colors ${!selectedCat ? 'bg-accent text-accent-ink' : 'bg-surface-muted text-ink-muted hover:text-ink'}`}>{t('catalog.all')}</button>
         {categories.map((c) => (
-          <button key={c.id} onClick={() => setSelectedCat(c.id.toString())} className={`px-3 py-1 rounded text-sm ${selectedCat === c.id.toString() ? 'bg-gray-900 dark:bg-white dark:text-gray-900 text-white' : 'bg-gray-100 dark:bg-gray-800 dark:text-gray-300'}`}>{c.name}</button>
+          <button key={c.id} onClick={() => setSelectedCat(c.id.toString())} className={`px-3 py-1 rounded-control text-sm transition-colors ${selectedCat === c.id.toString() ? 'bg-accent text-accent-ink' : 'bg-surface-muted text-ink-muted hover:text-ink'}`}>{c.name}</button>
         ))}
       </div>
       <div className="grid grid-cols-3 gap-6">
         {filtered.map((p) => (
-          <Link key={p.id} to={`/products/${p.slug}`} className="bg-white dark:bg-gray-900 rounded-lg shadow dark:shadow-gray-900/50 p-4 hover:shadow-md transition-shadow">
-            <h2 className="font-semibold dark:text-white">{p.name}</h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400">{p.category_name}</p>
+          <Link key={p.id} to={`/products/${p.slug}`} className="bg-surface border border-border rounded-card shadow-card p-card hover:shadow-card-hover hover:-translate-y-0.5 transition-all">
+            <h2 className="font-semibold text-ink">{p.name}</h2>
+            <p className="text-sm text-ink-muted">{p.category_name}</p>
           </Link>
         ))}
       </div>

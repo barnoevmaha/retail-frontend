@@ -11,20 +11,20 @@ export default function Header() {
   const langs = getLanguages()
 
   return (
-    <header className="bg-white dark:bg-gray-900 shadow-sm border-b dark:border-gray-800 transition-colors">
-      <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
-        <Link to="/" className="font-bold text-lg dark:text-white">{t('app.name')}</Link>
+    <header className="bg-surface shadow-sm border-b border-border transition-colors">
+      <div className="max-w-6xl mx-auto px-gutter h-14 flex items-center justify-between">
+        <Link to="/" className="font-display font-bold text-lg text-ink">{t('app.name')}</Link>
         <nav className="flex items-center gap-4 text-sm">
-          <Link to="/catalog" className="hover:text-gray-600 dark:hover:text-gray-300 dark:text-gray-300">{t('nav.catalog')}</Link>
-          <Link to="/cart" className="relative hover:text-gray-600 dark:hover:text-gray-300 dark:text-gray-300">
+          <Link to="/catalog" className="text-ink-muted hover:text-accent transition-colors">{t('nav.catalog')}</Link>
+          <Link to="/cart" className="relative text-ink-muted hover:text-accent transition-colors">
             {t('nav.cart')}
-            {count > 0 && <span className="absolute -top-2 -right-4 bg-gray-900 dark:bg-white dark:text-gray-900 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">{count}</span>}
+            {count > 0 && <span className="absolute -top-2 -right-4 bg-accent text-accent-ink text-xs rounded-full w-5 h-5 flex items-center justify-center">{count}</span>}
           </Link>
 
           <select
             value={getLanguage()}
             onChange={(e) => setLanguage(e.target.value)}
-            className="text-xs border rounded px-1 py-0.5 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700"
+            className="text-xs border border-border rounded-control px-1.5 py-0.5 bg-surface text-ink-muted"
           >
             {langs.map((l) => (
               <option key={l.code} value={l.code}>{l.label}</option>
@@ -33,16 +33,16 @@ export default function Header() {
 
           <button
             onClick={() => setTheme(mode === 'dark' ? 'light' : mode === 'light' ? 'system' : 'dark')}
-            className="text-sm hover:text-gray-600 dark:hover:text-gray-300 dark:text-gray-300"
+            className="text-sm text-ink-muted hover:text-accent transition-colors"
             title={t(`theme.${mode}`)}
           >
             {mode === 'dark' ? '🌙' : mode === 'light' ? '☀️' : '💻'}
           </button>
 
           {customer ? (
-            <Link to="/account" className="hover:text-gray-600 dark:hover:text-gray-300 dark:text-gray-300">{customer.first_name}</Link>
+            <Link to="/account" className="text-ink-muted hover:text-accent transition-colors">{customer.first_name}</Link>
           ) : (
-            <Link to="/login" className="hover:text-gray-600 dark:hover:text-gray-300 dark:text-gray-300">{t('nav.signin')}</Link>
+            <Link to="/login" className="font-medium text-accent hover:text-accent-hover transition-colors">{t('nav.signin')}</Link>
           )}
         </nav>
       </div>

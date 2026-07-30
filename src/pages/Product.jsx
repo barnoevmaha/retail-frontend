@@ -16,7 +16,7 @@ export default function Product() {
     api.get(`/products/${slug}`).then((r) => { setProduct(r.data); setVariant(r.data.variants?.[0] || null) }).catch(() => {})
   }, [slug])
 
-  if (!product) return <div className="dark:text-gray-300">Loading...</div>
+  if (!product) return <div className="text-ink-muted">Loading...</div>
 
   const handleAdd = async () => {
     if (!variant) return
@@ -26,20 +26,20 @@ export default function Product() {
 
   return (
     <div className="max-w-3xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4 dark:text-white">{product.name}</h1>
-      <p className="text-gray-600 dark:text-gray-400 mb-4">{product.description}</p>
+      <h1 className="text-2xl font-bold mb-4 text-ink">{product.name}</h1>
+      <p className="text-ink-muted mb-4">{product.description}</p>
       <div className="flex gap-2 mb-4">
         {product.variants?.map((v) => (
-          <button key={v.id} onClick={() => setVariant(v)} className={`px-3 py-1 rounded text-sm border dark:border-gray-700 ${variant?.id === v.id ? 'bg-gray-900 dark:bg-white dark:text-gray-900 text-white' : 'dark:text-gray-300'}`}>{v.size} {v.color}</button>
+          <button key={v.id} onClick={() => setVariant(v)} className={`px-3 py-1 rounded-control text-sm border transition-colors ${variant?.id === v.id ? 'bg-accent text-accent-ink border-accent' : 'border-border text-ink-muted hover:border-accent hover:text-ink'}`}>{v.size} {v.color}</button>
         ))}
       </div>
       {variant && (
-        <p className="text-lg font-bold mb-4 dark:text-white">{t('product.price').replace('{price}', variant.selling_price)}</p>
+        <p className="text-xl font-display font-semibold mb-4 text-accent">{t('product.price').replace('{price}', variant.selling_price)}</p>
       )}
       {variant && variant.quantity > 0 ? (
-        <button onClick={handleAdd} className="bg-gray-900 dark:bg-white dark:text-gray-900 text-white px-6 py-2 rounded hover:bg-gray-800 dark:hover:bg-gray-200">{t('product.add_to_cart')}</button>
+        <button onClick={handleAdd} className="bg-accent text-accent-ink px-6 py-2.5 rounded-control font-medium hover:bg-accent-hover transition-colors">{t('product.add_to_cart')}</button>
       ) : (
-        <p className="text-red-500">{t('product.out_of_stock')}</p>
+        <p className="text-danger font-medium">{t('product.out_of_stock')}</p>
       )}
     </div>
   )

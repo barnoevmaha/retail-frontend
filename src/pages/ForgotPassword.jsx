@@ -49,20 +49,20 @@ export default function ForgotPassword() {
   if (step === 'reset') {
     return (
       <div className="max-w-md mx-auto">
-        <h1 className="text-2xl font-bold mb-6 dark:text-white">{t('auth.reset.title')}</h1>
-        {message && <div className="bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300 p-2 rounded mb-4 text-sm">{message}</div>}
-        {error && <div className="bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300 p-2 rounded mb-4 text-sm">{error}</div>}
+        <h1 className="text-2xl font-bold mb-6 text-ink">{t('auth.reset.title')}</h1>
+        {message && <div className="bg-success-bg text-success p-3 rounded-control mb-4 text-sm">{message}</div>}
+        {error && <div className="bg-danger-bg text-danger p-3 rounded-control mb-4 text-sm">{error}</div>}
         <form onSubmit={resetPassword}>
-          <input type="text" placeholder={t('auth.reset.code_placeholder')} className="w-full border dark:border-gray-700 dark:bg-gray-800 dark:text-white p-2 rounded mb-4 text-center text-2xl tracking-widest" value={code} onChange={(e) => setCode(e.target.value)} maxLength={6} required />
+          <input type="text" placeholder={t('auth.reset.code_placeholder')} className="w-full border border-border bg-surface text-ink rounded-control px-3 py-2 mb-4 text-center text-2xl tracking-widest focus:border-accent focus:outline-none transition-colors" value={code} onChange={(e) => setCode(e.target.value)} maxLength={6} required />
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('auth.reset.new_password')}</label>
+            <label className="block text-sm font-medium text-ink-muted mb-1">{t('auth.reset.new_password')}</label>
             <PasswordInput value={password.pwd} onChange={(e) => setPassword({ ...password, pwd: e.target.value })} placeholder={t('auth.register.password_hint')} />
           </div>
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('auth.reset.confirm_password')}</label>
+            <label className="block text-sm font-medium text-ink-muted mb-1">{t('auth.reset.confirm_password')}</label>
             <PasswordInput value={password.confirm} onChange={(e) => setPassword({ ...password, confirm: e.target.value })} placeholder={t('auth.register.confirm_password')} />
           </div>
-          <button disabled={loading} className="w-full bg-gray-900 dark:bg-white dark:text-gray-900 text-white p-2 rounded hover:bg-gray-800 dark:hover:bg-gray-200 disabled:opacity-50">{loading ? t('auth.reset.loading') : t('auth.reset.button')}</button>
+          <button disabled={loading} className="w-full bg-accent text-accent-ink p-2.5 rounded-control font-medium hover:bg-accent-hover transition-colors disabled:opacity-50">{loading ? t('auth.reset.loading') : t('auth.reset.button')}</button>
         </form>
       </div>
     )
@@ -70,22 +70,22 @@ export default function ForgotPassword() {
   if (step === 'done') {
     return (
       <div className="max-w-md mx-auto text-center">
-        <h1 className="text-2xl font-bold mb-4 dark:text-white">{t('auth.reset.done_title')}</h1>
-        <div className="bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300 p-4 rounded mb-4">{message}</div>
-        <Link to="/login" className="text-gray-900 dark:text-white underline">{t('auth.login.button')}</Link>
+        <h1 className="text-2xl font-bold mb-4 text-ink">{t('auth.reset.done_title')}</h1>
+        <div className="bg-success-bg text-success p-4 rounded-control mb-4">{message}</div>
+        <Link to="/login" className="font-medium text-accent hover:text-accent-hover transition-colors">{t('auth.login.button')}</Link>
       </div>
     )
   }
   return (
     <div className="max-w-md mx-auto">
-      <h1 className="text-2xl font-bold mb-6 dark:text-white">{t('auth.forgot.title')}</h1>
-      {error && <div className="bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300 p-2 rounded mb-4 text-sm">{error}</div>}
-      <p className="text-gray-600 dark:text-gray-400 mb-4">{t('auth.forgot.description')}</p>
+      <h1 className="text-2xl font-bold mb-6 text-ink">{t('auth.forgot.title')}</h1>
+      {error && <div className="bg-danger-bg text-danger p-3 rounded-control mb-4 text-sm">{error}</div>}
+      <p className="text-ink-muted mb-4">{t('auth.forgot.description')}</p>
       <form onSubmit={sendCode}>
-        <input type="text" placeholder={t('auth.forgot.identifier')} className="w-full border dark:border-gray-700 dark:bg-gray-800 dark:text-white p-2 rounded mb-4" value={identifier} onChange={(e) => setIdentifier(e.target.value)} required />
-        <button disabled={loading} className="w-full bg-gray-900 dark:bg-white dark:text-gray-900 text-white p-2 rounded hover:bg-gray-800 dark:hover:bg-gray-200 disabled:opacity-50">{loading ? t('auth.forgot.sending') : t('auth.forgot.send')}</button>
+        <input type="text" placeholder={t('auth.forgot.identifier')} className="w-full border border-border bg-surface text-ink rounded-control px-3 py-2 mb-4 focus:border-accent focus:outline-none transition-colors" value={identifier} onChange={(e) => setIdentifier(e.target.value)} required />
+        <button disabled={loading} className="w-full bg-accent text-accent-ink p-2.5 rounded-control font-medium hover:bg-accent-hover transition-colors disabled:opacity-50">{loading ? t('auth.forgot.sending') : t('auth.forgot.send')}</button>
       </form>
-      <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-4"><Link to="/login" className="text-gray-900 dark:text-white underline">{t('auth.forgot.back')}</Link></p>
+      <p className="text-center text-sm text-ink-muted mt-4"><Link to="/login" className="font-medium text-accent hover:text-accent-hover transition-colors">{t('auth.forgot.back')}</Link></p>
     </div>
   )
 }

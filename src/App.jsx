@@ -19,9 +19,9 @@ export default function App() {
       <CartProvider>
         <ThemeProvider>
           <ToastProvider>
-            <div className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors">
+            <div className="min-h-screen bg-bg transition-colors">
               <Header />
-              <main className="max-w-6xl mx-auto px-4 py-6">
+              <main className="max-w-6xl mx-auto px-gutter py-section">
                 <Routes>
                   <Route index element={<Home />} />
                   <Route path="catalog" element={<Catalog />} />
