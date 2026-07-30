@@ -1,48 +1,37 @@
 import { useState, useEffect } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import api from '../api/client'
+import { t } from '../i18n'
 
 export default function Catalog() {
-  const [params] = useSearchParams()
   const [products, setProducts] = useState([])
-  const [cats, setCats] = useState([])
-  const [q, setQ] = useState('')
-  const categoryId = params.get('category')
+  const [categories, setCategories] = useState([])
+  const [selectedCat, setSelectedCat] = useState('')
 
   useEffect(() => {
-    api.get('/categories/').then((r) => setCats(r.data)).catch(() => {})
+    api.get('/products/').then((r) => setProducts(r.data)).catch(() => {})
+    api.get('/categories/').then((r) => setCategories(r.data)).catch(() => {})
   }, [])
 
-  useEffect(() => {
-    api.get('/products/', { params: { q, category_id: categoryId || undefined, limit: 50 } })
-      .then((r) => setProducts(r.data.items))
-      .catch(() => {})
-  }, [q, categoryId])
+  const filtered = selectedCat ? products.filter((p) => p.category_id === parseInt(selectedCat)) : products
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-4">Catalog</h1>
-      <div className="flex gap-4 mb-6">
-        <input type="text" placeholder="Search products..."
-          className="border p-2 rounded flex-1"
-          value={q} onChange={(e) => setQ(e.target.value)} />
-        <select className="border p-2 rounded" value={categoryId || ''}
-          onChange={(e) => { const url = e.target.value ? `?category=${e.target.value}` : '/catalog'; window.location.href = url }}>
-          <option value="">All Categories</option>
-          {cats.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-        </select>
+      <h1 className="text-2xl font-bold mb-6 dark:text-white">{t('catalog.title')}</h1>
+      <div className="flex gap-2 mb-6 flex-wrap">
+        <button onClick={() => setSelectedCat('')} className={`px-3 py-1 rounded text-sm ${!selectedCat ? 'bg-gray-900 dark:bg-white dark:text-gray-900 text-white' : 'bg-gray-100 dark:bg-gray-800 dark:text-gray-300'}`}>{t('catalog.all')}</button>
+        {categories.map((c) => (
+          <button key={c.id} onClick={() => setSelectedCat(c.id.toString())} className={`px-3 py-1 rounded text-sm ${selectedCat === c.id.toString() ? 'bg-gray-900 dark:bg-white dark:text-gray-900 text-white' : 'bg-gray-100 dark:bg-gray-800 dark:text-gray-300'}`}>{c.name}</button>
+        ))}
       </div>
-
-      <div className="grid grid-cols-4 gap-4">
-        {products.map((p) => (
-          <Link key={p.id} to={`/products/${p.slug}`}
-            className="bg-white rounded-lg shadow p-4 hover:shadow-md transition">
-            <div className="bg-gray-100 h-40 rounded mb-3 flex items-center justify-center text-gray-400">Photo</div>
-            <div className="font-medium text-sm">{p.name}</div>
+      <div className="grid grid-cols-3 gap-6">
+        {filtered.map((p) => (
+          <Link key={p.id} to={`/products/${p.slug}`} className="bg-white dark:bg-gray-900 rounded-lg shadow dark:shadow-gray-900/50 p-4 hover:shadow-md transition-shadow">
+            <h2 className="font-semibold dark:text-white">{p.name}</h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{p.category_name}</p>
           </Link>
         ))}
       </div>
-      {products.length === 0 && <div className="text-center text-gray-400 py-12">No products found</div>}
     </div>
   )
 }

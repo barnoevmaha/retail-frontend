@@ -12,7 +12,10 @@ export function AuthProvider({ children }) {
     if (token) {
       api.get('/customer/account/me')
         .then((r) => setCustomer(r.data))
-        .catch(() => localStorage.removeItem('customer_token'))
+        .catch(() => {
+          localStorage.removeItem('customer_token')
+          localStorage.removeItem('token')
+        })
         .finally(() => setLoading(false))
     } else {
       setLoading(false)
@@ -26,6 +29,7 @@ export function AuthProvider({ children }) {
 
   const logout = () => {
     localStorage.removeItem('customer_token')
+    localStorage.removeItem('token')
     setCustomer(null)
   }
 
