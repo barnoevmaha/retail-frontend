@@ -24,9 +24,9 @@ export function ToastProvider({ children }) {
             key={t.id}
             className={`px-4 py-3 rounded-control shadow-lg text-sm font-medium transition-all animate-slide-up ${
               t.type === 'success'
-                ? 'bg-success text-white'
+                ? 'bg-success text-on-solid'
                 : t.type === 'error'
-                ? 'bg-danger text-white'
+                ? 'bg-danger text-on-solid'
                 : 'bg-ink text-bg'
             }`}
           >

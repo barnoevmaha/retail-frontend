@@ -4,9 +4,10 @@ import api from '../api/client'
 import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
 import PasswordInput from '../components/PasswordInput'
-import { t } from '../i18n'
+import { useI18n } from '../i18n'
 
 export default function Register() {
+  const { t } = useI18n()
   const [method, setMethod] = useState('email')
   const [step, setStep] = useState('form')
   const [form, setForm] = useState({ first_name: '', last_name: '', email: '', phone: '' })
@@ -48,9 +49,9 @@ export default function Register() {
       }
       setStep('code')
       startResendTimer()
-      toast?.addToast(t('auth.register.success').replace('{target}', method === 'email' ? form.email : form.phone), 'success')
+      toast?.addToast(t("Registration successful. We've sent a verification code to your {target}.").replace('{target}', method === 'email' ? form.email : form.phone), 'success')
     } catch (err) {
-      setError(err.response?.data?.detail || t('toast.error'))
+      setError(err.response?.data?.detail || t("An error occurred"))
     } finally {
       setLoading(false)
     }
@@ -66,9 +67,9 @@ export default function Register() {
         await api.post('/customer/auth/register/phone', { first_name: form.first_name, last_name: form.last_name, phone: form.phone })
       }
       startResendTimer()
-      toast?.addToast(t('auth.register.resend'), 'success')
+      toast?.addToast(t("A new verification code has been sent."), 'success')
     } catch (err) {
-      setError(err.response?.data?.detail || t('toast.error'))
+      setError(err.response?.data?.detail || t("An error occurred"))
     } finally {
       setLoading(false)
     }
@@ -78,11 +79,11 @@ export default function Register() {
     e.preventDefault()
     setError('')
     if (password.pwd !== password.confirm) {
-      setError(t('auth.error.passwords_mismatch'))
+      setError(t("Passwords do not match"))
       return
     }
     if (password.pwd.length < 8) {
-      setError(t('auth.error.password_length'))
+      setError(t("Password must be at least 8 characters"))
       return
     }
     setLoading(true)
@@ -100,66 +101,106 @@ export default function Register() {
         })
       }
       login(res.data.access_token, res.data.customer)
-      toast?.addToast(t('auth.register.verified'), 'success')
-      navigate('/account')
+      toast?.addToast(t("Your account has been verified successfully."), 'success')
+      navigate('/account', { state: { justRegistered: true } })
     } catch (err) {
-      setError(err.response?.data?.detail || t('toast.error'))
+      setError(err.response?.data?.detail || t("An error occurred"))
     } finally {
       setLoading(false)
     }
   }
 
+  const panel = (title, children) => (
+    <div className="max-w-md mx-auto">
+      <div className="text-center mb-12">
+        <p className="eyebrow text-accent mb-4">{t("The Maison")}</p>
+        <h1 className="font-display text-headline-lg text-ink">{title}</h1>
+      </div>
+      {error && <div className="bg-danger-bg text-danger p-4 rounded-lg mb-8 text-sm border border-danger/20">{error}</div>}
+      {children}
+    </div>
+  )
+
   if (step === 'code') {
-    return (
-      <div className="max-w-md mx-auto">
-        <h1 className="text-2xl font-bold mb-6 text-ink">{t('auth.register.code_title')}</h1>
-        <p className="text-ink-muted mb-4">{t('auth.register.code_sent').replace('{target}', method === 'email' ? form.email : form.phone)}</p>
-        {error && <div className="bg-danger-bg text-danger p-3 rounded-control mb-4 text-sm">{error}</div>}
+    return panel(
+      t("Enter Code"),
+      <>
+        <p className="text-body-md text-ink-muted mb-10 text-center">
+          {t("A 6-digit code was sent to {target}").replace('{target}', method === 'email' ? form.email : form.phone)}
+        </p>
         <form onSubmit={verifyCode}>
-          <input type="text" placeholder={t('auth.register.code_placeholder')} className="w-full border border-border bg-surface text-ink rounded-control px-3 py-2 mb-4 text-center text-2xl tracking-widest focus:border-accent focus:outline-none transition-colors" value={code} onChange={(e) => setCode(e.target.value)} maxLength={6} required />
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-ink-muted mb-1">{t('auth.register.password')}</label>
-            <PasswordInput value={password.pwd} onChange={(e) => setPassword({ ...password, pwd: e.target.value })} placeholder={t('auth.register.password_hint')} />
+          <input
+            type="text" placeholder={t("000000")}
+            className="input-line mb-10 text-center text-2xl tracking-[0.5em]"
+            value={code} onChange={(e) => setCode(e.target.value)} maxLength={6} required
+          />
+          <div className="mb-8">
+            <label className="block eyebrow text-ink-muted mb-1">{t("Password")}</label>
+            <PasswordInput value={password.pwd} onChange={(e) => setPassword({ ...password, pwd: e.target.value })} placeholder={t("At least 8 characters")} />
           </div>
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-ink-muted mb-1">{t('auth.register.confirm_password')}</label>
-            <PasswordInput value={password.confirm} onChange={(e) => setPassword({ ...password, confirm: e.target.value })} placeholder={t('auth.register.confirm_password')} />
+          <div className="mb-10">
+            <label className="block eyebrow text-ink-muted mb-1">{t("Confirm Password")}</label>
+            <PasswordInput value={password.confirm} onChange={(e) => setPassword({ ...password, confirm: e.target.value })} placeholder={t("Confirm Password")} />
           </div>
-          <button disabled={loading} className="w-full bg-accent text-accent-ink p-2.5 rounded-control font-medium hover:bg-accent-hover transition-colors disabled:opacity-50">{loading ? t('auth.register.verifying') : t('auth.register.verify')}</button>
+          <button disabled={loading} className="btn-primary w-full py-5">{loading ? t("Verifying...") : t("Create Account")}</button>
         </form>
-        <div className="text-center mt-3">
+        <div className="text-center mt-6">
           {resendTimer > 0 ? (
-            <span className="text-sm text-ink-muted">{resendTimer}s</span>
+            <span className="eyebrow text-ink-muted">{resendTimer}s</span>
           ) : (
-            <button onClick={resendCode} disabled={loading} className="text-sm text-ink-muted hover:text-accent transition-colors underline underline-offset-2">{t('auth.register.send_code')}</button>
+            <button onClick={resendCode} disabled={loading} className="eyebrow text-ink-muted hover:text-accent transition-colors underline underline-offset-4">{t("Send Verification Code")}</button>
           )}
         </div>
-        <button onClick={() => setStep('form')} className="w-full text-center text-sm text-ink-muted mt-3 hover:text-accent transition-colors">{t('auth.register.back')}</button>
-      </div>
+        <button onClick={() => setStep('form')} className="w-full text-center text-body-md text-ink-muted mt-4 hover:text-accent transition-colors">{t("Back")}</button>
+      </>
     )
   }
 
-  return (
-    <div className="max-w-md mx-auto">
-      <h1 className="text-2xl font-bold mb-6 text-ink">{t('auth.register.title')}</h1>
-      {error && <div className="bg-danger-bg text-danger p-3 rounded-control mb-4 text-sm">{error}</div>}
-      <div className="flex mb-6 border border-border rounded-control overflow-hidden">
-        <button onClick={() => setMethod('email')} className={`flex-1 p-2 text-sm font-medium transition-colors ${method === 'email' ? 'bg-accent text-accent-ink' : 'bg-surface text-ink-muted'}`}>{t('auth.register.email')}</button>
-        <button onClick={() => setMethod('phone')} className={`flex-1 p-2 text-sm font-medium transition-colors ${method === 'phone' ? 'bg-accent text-accent-ink' : 'bg-surface text-ink-muted'}`}>{t('auth.register.phone')}</button>
+  return panel(
+    t("Create Account"),
+    <>
+      <div className="flex mb-10 border border-border/40">
+        <button
+          onClick={() => setMethod('email')}
+          className={`flex-1 py-3.5 text-label-sm uppercase tracking-widest transition-colors duration-300 ${method === 'email' ? 'bg-ink text-bg' : 'text-ink-muted hover:text-ink'}`}
+        >
+          {t("Continue with Email")}
+        </button>
+        <button
+          onClick={() => setMethod('phone')}
+          className={`flex-1 py-3.5 text-label-sm uppercase tracking-widest transition-colors duration-300 ${method === 'phone' ? 'bg-ink text-bg' : 'text-ink-muted hover:text-ink'}`}
+        >
+          {t("Continue with Phone")}
+        </button>
       </div>
       <form onSubmit={sendCode}>
-        <div className="flex gap-3 mb-3">
-          <input type="text" placeholder={t('auth.register.first_name')} className="flex-1 border border-border bg-surface text-ink rounded-control px-3 py-2 focus:border-accent focus:outline-none transition-colors" value={form.first_name} onChange={set('first_name')} required />
-          <input type="text" placeholder={t('auth.register.last_name')} className="flex-1 border border-border bg-surface text-ink rounded-control px-3 py-2 focus:border-accent focus:outline-none transition-colors" value={form.last_name} onChange={set('last_name')} required />
+        <div className="grid grid-cols-2 gap-6 mb-8">
+          <div>
+            <label className="block eyebrow text-ink-muted mb-1">{t("First Name")}</label>
+            <input type="text" placeholder={t("First Name")} className="input-line" value={form.first_name} onChange={set('first_name')} required />
+          </div>
+          <div>
+            <label className="block eyebrow text-ink-muted mb-1">{t("Last Name")}</label>
+            <input type="text" placeholder={t("Last Name")} className="input-line" value={form.last_name} onChange={set('last_name')} required />
+          </div>
         </div>
-        {method === 'email' ? (
-          <input type="email" placeholder={t('auth.register.email_placeholder')} className="w-full border border-border bg-surface text-ink rounded-control px-3 py-2 mb-4 focus:border-accent focus:outline-none transition-colors" value={form.email} onChange={set('email')} required />
-        ) : (
-          <input type="tel" placeholder={t('auth.register.phone_placeholder')} className="w-full border border-border bg-surface text-ink rounded-control px-3 py-2 mb-4 focus:border-accent focus:outline-none transition-colors" value={form.phone} onChange={set('phone')} required />
-        )}
-        <button disabled={loading} className="w-full bg-accent text-accent-ink p-2.5 rounded-control font-medium hover:bg-accent-hover transition-colors disabled:opacity-50">{loading ? t('auth.register.sending') : t('auth.register.send_code')}</button>
+        <div className="mb-10">
+          <label className="block eyebrow text-ink-muted mb-1">{method === 'email' ? t("Email") : t("Phone number")}</label>
+          <input
+            type={method === 'email' ? 'email' : 'tel'}
+            placeholder={method === 'email' ? t("Email") : t("Phone number")}
+            className="input-line"
+            value={method === 'email' ? form.email : form.phone}
+            onChange={set(method === 'email' ? 'email' : 'phone')}
+            required
+          />
+        </div>
+        <button disabled={loading} className="btn-primary w-full py-5">{loading ? t("Sending...") : t("Send Verification Code")}</button>
       </form>
-      <p className="text-center text-sm text-ink-muted mt-4">{t('auth.register.have_account')} <Link to="/login" className="font-medium text-accent hover:text-accent-hover transition-colors">{t('auth.login.button')}</Link></p>
-    </div>
+      <p className="text-center text-body-md text-ink-muted mt-8">
+        {t("Already have an account?")}{' '}
+        <Link to="/login" className="eyebrow text-accent hover:text-accent-hover transition-colors">{t("Sign In")}</Link>
+      </p>
+    </>
   )
 }

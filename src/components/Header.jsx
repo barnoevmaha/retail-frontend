@@ -1,50 +1,89 @@
-import { Link } from 'react-router-dom'
+import { Link, NavLink } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
-import { t, setLanguage, getLanguage, getLanguages } from '../i18n'
+import { useI18n, getLanguages } from '../i18n'
+
+const NAV = [
+  { to: '/catalog', label: 'Collections' },
+  { to: '/market', label: 'New Arrivals' },
+]
 
 export default function Header() {
   const { count } = useCart()
   const { customer } = useAuth()
   const { mode, setTheme } = useTheme()
+  const { t, lang, setLanguage } = useI18n()
   const langs = getLanguages()
 
-  return (
-    <header className="bg-surface shadow-sm border-b border-border transition-colors">
-      <div className="max-w-6xl mx-auto px-gutter h-14 flex items-center justify-between">
-        <Link to="/" className="font-display font-bold text-lg text-ink">{t('app.name')}</Link>
-        <nav className="flex items-center gap-4 text-sm">
-          <Link to="/catalog" className="text-ink-muted hover:text-accent transition-colors">{t('nav.catalog')}</Link>
-          <Link to="/cart" className="relative text-ink-muted hover:text-accent transition-colors">
-            {t('nav.cart')}
-            {count > 0 && <span className="absolute -top-2 -right-4 bg-accent text-accent-ink text-xs rounded-full w-5 h-5 flex items-center justify-center">{count}</span>}
-          </Link>
+  const themeIcon = mode === 'dark' ? 'light_mode' : mode === 'light' ? 'dark_mode' : 'contrast'
+  const cycleTheme = () => {
+    const next = mode === 'dark' ? 'light' : mode === 'light' ? 'system' : 'dark'
+    setTheme(next)
+  }
 
+  return (
+    <header className="fixed top-0 w-full z-50 bg-bg/80 backdrop-blur-xl border-b border-border/10">
+      <div className="flex justify-between items-center w-full px-mobile-margin md:px-section-padding-h py-5 mx-auto max-w-container-max">
+        {/* Desktop nav */}
+        <nav className="hidden md:flex items-center gap-8">
+          {NAV.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              className={({ isActive }) =>
+                `eyebrow transition-colors duration-500 ${isActive ? 'text-ink border-b border-ink pb-1' : 'text-ink-muted hover:text-ink'}`
+              }
+            >
+              {t(item.label)}
+            </NavLink>
+          ))}
+        </nav>
+
+        {/* Brand wordmark */}
+        <Link to="/" className="font-display text-headline-md font-bold tracking-tighter text-ink uppercase">
+          Aurelius
+        </Link>
+
+        {/* Trailing actions */}
+        <div className="flex items-center gap-5 md:gap-6">
           <select
-            value={getLanguage()}
+            value={lang}
             onChange={(e) => setLanguage(e.target.value)}
-            className="text-xs border border-border rounded-control px-1.5 py-0.5 bg-surface text-ink-muted"
+            className="bg-transparent border-0 border-b border-border/60 text-label-sm uppercase tracking-widest text-ink-muted focus:border-accent focus:outline-none cursor-pointer py-0.5"
+            aria-label="Language"
           >
             {langs.map((l) => (
-              <option key={l.code} value={l.code}>{l.label}</option>
+              <option key={l.code} value={l.code} className="bg-surface text-ink">{l.label}</option>
             ))}
           </select>
 
           <button
-            onClick={() => setTheme(mode === 'dark' ? 'light' : mode === 'light' ? 'system' : 'dark')}
-            className="text-sm text-ink-muted hover:text-accent transition-colors"
-            title={t(`theme.${mode}`)}
+            onClick={cycleTheme}
+            className="text-ink-muted hover:text-ink transition-colors duration-500"
+            title={t(mode === 'dark' ? 'Dark' : mode === 'light' ? 'Light' : 'System')}
+            aria-label="Toggle theme"
           >
-            {mode === 'dark' ? '🌙' : mode === 'light' ? '☀️' : '💻'}
+            <span className="material-symbols-outlined text-[20px]">{themeIcon}</span>
           </button>
 
+          <Link to="/cart" className="relative text-ink-muted hover:text-ink transition-colors duration-500" aria-label="Cart">
+            <span className="material-symbols-outlined text-[20px]">shopping_bag</span>
+            {count > 0 && (
+              <span className="absolute -top-1.5 -right-2 min-w-4 h-4 px-1 rounded-full bg-accent text-accent-ink text-[10px] flex items-center justify-center">{count}</span>
+            )}
+          </Link>
+
           {customer ? (
-            <Link to="/account" className="text-ink-muted hover:text-accent transition-colors">{customer.first_name}</Link>
+            <Link to="/account" className="text-ink-muted hover:text-ink transition-colors duration-500" aria-label="Account">
+              <span className="material-symbols-outlined text-[20px]">person</span>
+            </Link>
           ) : (
-            <Link to="/login" className="font-medium text-accent hover:text-accent-hover transition-colors">{t('nav.signin')}</Link>
+            <Link to="/login" className="eyebrow text-accent hover:text-accent-hover transition-colors duration-500">
+              {t("Sign In")}
+            </Link>
           )}
-        </nav>
+        </div>
       </div>
     </header>
   )

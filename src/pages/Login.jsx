@@ -4,9 +4,10 @@ import api from '../api/client'
 import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
 import PasswordInput from '../components/PasswordInput'
-import { t } from '../i18n'
+import { useI18n } from '../i18n'
 
 export default function Login() {
+  const { t } = useI18n()
   const [login, setLogin] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -26,9 +27,9 @@ export default function Login() {
       navigate('/account')
     } catch (err) {
       if (err.response?.status === 423) {
-        setError(t('auth.login.locked'))
+        setError(t("Account is locked. Try again in 15 minutes."))
       } else {
-        setError(err.response?.data?.detail || t('auth.login.invalid'))
+        setError(err.response?.data?.detail || t("Invalid credentials"))
       }
     } finally {
       setLoading(false)
@@ -37,28 +38,43 @@ export default function Login() {
 
   return (
     <div className="max-w-md mx-auto">
-      <h1 className="text-2xl font-bold mb-6 text-ink">{t('auth.login.title')}</h1>
-      {error && <div className="bg-danger-bg text-danger p-3 rounded-control mb-4 text-sm">{error}</div>}
+      <div className="text-center mb-12">
+        <p className="eyebrow text-accent mb-4">{t("The Maison")}</p>
+        <h1 className="font-display text-headline-lg text-ink">{t("Sign In")}</h1>
+      </div>
+
+      {error && (
+        <div className="bg-danger-bg text-danger p-4 rounded-lg mb-8 text-sm border border-danger/20">{error}</div>
+      )}
+
       <form onSubmit={handleSubmit}>
-        <input
-          type="text" placeholder={t('auth.login.email_or_phone')}
-          className="w-full border border-border bg-surface text-ink rounded-control px-3 py-2 mb-3 focus:border-accent focus:outline-none transition-colors"
-          value={login} onChange={(e) => setLogin(e.target.value)} required
-        />
-        <PasswordInput
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder={t('auth.login.password')}
-        />
-        <div className="text-right mt-1 mb-4">
-          <Link to="/forgot-password" className="text-sm text-ink-muted hover:text-accent transition-colors">{t('auth.login.forgot')}</Link>
+        <div className="mb-8">
+          <label className="block eyebrow text-ink-muted mb-1">{t("Email or phone")}</label>
+          <input
+            type="text" placeholder={t("Email or phone")}
+            className="input-line"
+            value={login} onChange={(e) => setLogin(e.target.value)} required
+          />
         </div>
-        <button disabled={loading} className="w-full bg-accent text-accent-ink p-2.5 rounded-control font-medium hover:bg-accent-hover transition-colors disabled:opacity-50">
-          {loading ? t('auth.login.loading') : t('auth.login.button')}
+        <div className="mb-8">
+          <label className="block eyebrow text-ink-muted mb-1">{t("Password")}</label>
+          <PasswordInput
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder={t("Password")}
+          />
+        </div>
+        <div className="text-right mb-10">
+          <Link to="/forgot-password" className="eyebrow text-ink-muted hover:text-accent transition-colors">{t("Forgot password?")}</Link>
+        </div>
+        <button disabled={loading} className="btn-primary w-full py-5">
+          {loading ? t("Signing in...") : t("Sign In")}
         </button>
       </form>
-      <p className="text-center text-sm text-ink-muted mt-4">
-        {t('auth.login.no_account')} <Link to="/register" className="font-medium text-accent hover:text-accent-hover transition-colors">{t('auth.login.create')}</Link>
+
+      <p className="text-center text-body-md text-ink-muted mt-8">
+        {t("Don't have an account?")}{' '}
+        <Link to="/register" className="eyebrow text-accent hover:text-accent-hover transition-colors">{t("Create one")}</Link>
       </p>
     </div>
   )

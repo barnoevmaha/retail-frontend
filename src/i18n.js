@@ -1,388 +1,118 @@
-const translations = {
-  en: {
-    'app.name': 'Clothes Shop',
-    'nav.catalog': 'Catalog',
-    'nav.cart': 'Cart',
-    'nav.signin': 'Sign In',
-    'nav.account': 'Account',
-    'nav.logout': 'Logout',
-    'auth.login.title': 'Sign In',
-    'auth.login.email_or_phone': 'Email or phone',
-    'auth.login.password': 'Password',
-    'auth.login.forgot': 'Forgot password?',
-    'auth.login.button': 'Sign In',
-    'auth.login.loading': 'Signing in...',
-    'auth.login.no_account': "Don't have an account?",
-    'auth.login.create': 'Create one',
-    'auth.login.locked': 'Account is locked. Try again in 15 minutes.',
-    'auth.login.invalid': 'Invalid credentials',
-    'auth.register.title': 'Create Account',
-    'auth.register.email': 'Continue with Email',
-    'auth.register.phone': 'Continue with Phone',
-    'auth.register.first_name': 'First Name',
-    'auth.register.last_name': 'Last Name',
-    'auth.register.email_placeholder': 'Email',
-    'auth.register.phone_placeholder': 'Phone number',
-    'auth.register.send_code': 'Send Verification Code',
-    'auth.register.sending': 'Sending...',
-    'auth.register.have_account': 'Already have an account?',
-    'auth.register.code_title': 'Enter Code',
-    'auth.register.code_sent': 'A 6-digit code was sent to {target}',
-    'auth.register.code_placeholder': '000000',
-    'auth.register.password': 'Password',
-    'auth.register.password_hint': 'At least 8 characters',
-    'auth.register.confirm_password': 'Confirm Password',
-    'auth.register.verify': 'Create Account',
-    'auth.register.verifying': 'Verifying...',
-    'auth.register.back': 'Back',
-    'auth.register.success': "Registration successful. We've sent a verification code to your {target}.",
-    'auth.register.resend': 'A new verification code has been sent.',
-    'auth.register.verified': 'Your account has been verified successfully.',
-    'auth.forgot.title': 'Forgot Password',
-    'auth.forgot.description': 'Enter your email or phone number to receive a reset code.',
-    'auth.forgot.identifier': 'Email or phone',
-    'auth.forgot.send': 'Send Reset Code',
-    'auth.forgot.sending': 'Sending...',
-    'auth.forgot.back': 'Back to Sign In',
-    'auth.reset.title': 'Reset Password',
-    'auth.reset.code_placeholder': '000000',
-    'auth.reset.new_password': 'New Password',
-    'auth.reset.confirm_password': 'Confirm Password',
-    'auth.reset.button': 'Reset Password',
-    'auth.reset.loading': 'Resetting...',
-    'auth.reset.sent': 'Reset code sent. Check your email or phone.',
-    'auth.reset.success': 'Password reset successfully. You can now sign in.',
-    'auth.reset.done_title': 'Password Reset',
-    'auth.error.passwords_mismatch': 'Passwords do not match',
-    'auth.error.password_length': 'Password must be at least 8 characters',
-    'account.title': 'My Account',
-    'account.logout': 'Logout',
-    'account.profile': 'Profile',
-    'account.addresses': 'Addresses',
-    'account.security': 'Security',
-    'account.save': 'Save',
-    'account.saving': 'Saving...',
-    'account.updated': 'Profile updated',
-    'account.first_name': 'First Name',
-    'account.last_name': 'Last Name',
-    'account.birthday': 'Birthday',
-    'account.gender': 'Gender',
-    'account.gender.none': 'Prefer not to say',
-    'account.gender.male': 'Male',
-    'account.gender.female': 'Female',
-    'account.gender.other': 'Other',
-    'account.newsletter': 'Subscribe to newsletter',
-    'account.language': 'Language',
-    'account.timezone': 'Timezone',
-    'account.email_info': 'Email: {value}',
-    'account.phone_info': 'Phone: {value}',
-    'account.loyalty': 'Loyalty: {level} ({points} pts)',
-    'account.email_verified': 'Email verified: {value}',
-    'account.phone_verified': 'Phone verified: {value}',
-    'account.no_email': 'No email linked. Contact support to add one.',
-    'account.no_phone': 'No phone linked. Contact support to add one.',
-    'account.address.add_title': 'Add Address',
-    'account.address.receiver_name': 'Receiver Name',
-    'account.address.receiver_phone': 'Receiver Phone',
-    'account.address.country': 'Country',
-    'account.address.city': 'City',
-    'account.address.street': 'Street',
-    'account.address.house': 'House',
-    'account.address.apartment': 'Apartment',
-    'account.address.postal_code': 'Postal Code',
-    'account.address.default_shipping': 'Default Shipping',
-    'account.address.default_billing': 'Default Billing',
-    'account.address.add': 'Add Address',
-    'account.address.adding': 'Adding...',
-    'account.address.added': 'Address added',
-    'account.address.delete': 'Delete',
-    'toast.error': 'An error occurred',
-    'theme.light': 'Light',
-    'theme.dark': 'Dark',
-    'theme.system': 'System',
-    'home.title': 'Welcome to Clothes Shop',
-    'home.subtitle': 'Discover the latest fashion trends',
-    'home.shop_now': 'Shop Now',
-    'home.featured': 'Featured Products',
-    'catalog.title': 'Catalog',
-    'catalog.all': 'All',
-    'catalog.search': 'Search products...',
-    'product.add_to_cart': 'Add to Cart',
-    'product.added_to_cart': 'Added to cart',
-    'product.out_of_stock': 'Out of stock',
-    'product.price': '${price}',
-    'cart.title': 'Shopping Cart',
-    'cart.empty': 'Your cart is empty',
-    'cart.total': 'Total: ${total}',
-    'cart.checkout': 'Checkout',
-    'cart.remove': 'Remove',
-    'cart.quantity': 'Qty: {qty}',
-  },
-  ru: {
-    'app.name': 'Магазин одежды',
-    'nav.catalog': 'Каталог',
-    'nav.cart': 'Корзина',
-    'nav.signin': 'Войти',
-    'nav.account': 'Аккаунт',
-    'nav.logout': 'Выйти',
-    'auth.login.title': 'Вход',
-    'auth.login.email_or_phone': 'Email или телефон',
-    'auth.login.password': 'Пароль',
-    'auth.login.forgot': 'Забыли пароль?',
-    'auth.login.button': 'Войти',
-    'auth.login.loading': 'Вход...',
-    'auth.login.no_account': 'Нет аккаунта?',
-    'auth.login.create': 'Создать',
-    'auth.login.locked': 'Аккаунт заблокирован. Попробуйте через 15 минут.',
-    'auth.login.invalid': 'Неверные данные',
-    'auth.register.title': 'Создать аккаунт',
-    'auth.register.email': 'Продолжить с Email',
-    'auth.register.phone': 'Продолжить с телефона',
-    'auth.register.first_name': 'Имя',
-    'auth.register.last_name': 'Фамилия',
-    'auth.register.email_placeholder': 'Email',
-    'auth.register.phone_placeholder': 'Номер телефона',
-    'auth.register.send_code': 'Отправить код',
-    'auth.register.sending': 'Отправка...',
-    'auth.register.have_account': 'Уже есть аккаунт?',
-    'auth.register.code_title': 'Введите код',
-    'auth.register.code_sent': '6-значный код отправлен на {target}',
-    'auth.register.code_placeholder': '000000',
-    'auth.register.password': 'Пароль',
-    'auth.register.password_hint': 'Минимум 8 символов',
-    'auth.register.confirm_password': 'Подтвердите пароль',
-    'auth.register.verify': 'Создать аккаунт',
-    'auth.register.verifying': 'Проверка...',
-    'auth.register.back': 'Назад',
-    'auth.register.success': 'Регистрация успешна. Код подтверждения отправлен на ваш {target}.',
-    'auth.register.resend': 'Новый код подтверждения отправлен.',
-    'auth.register.verified': 'Ваш аккаунт успешно подтвержден.',
-    'auth.forgot.title': 'Забыли пароль',
-    'auth.forgot.description': 'Введите email или номер телефона для получения кода сброса.',
-    'auth.forgot.identifier': 'Email или телефон',
-    'auth.forgot.send': 'Отправить код',
-    'auth.forgot.sending': 'Отправка...',
-    'auth.forgot.back': 'Назад к входу',
-    'auth.reset.title': 'Сброс пароля',
-    'auth.reset.code_placeholder': '000000',
-    'auth.reset.new_password': 'Новый пароль',
-    'auth.reset.confirm_password': 'Подтвердите пароль',
-    'auth.reset.button': 'Сбросить пароль',
-    'auth.reset.loading': 'Сброс...',
-    'auth.reset.sent': 'Код сброса отправлен. Проверьте email или телефон.',
-    'auth.reset.success': 'Пароль успешно сброшен. Теперь вы можете войти.',
-    'auth.reset.done_title': 'Пароль сброшен',
-    'auth.error.passwords_mismatch': 'Пароли не совпадают',
-    'auth.error.password_length': 'Пароль должен быть минимум 8 символов',
-    'account.title': 'Мой аккаунт',
-    'account.logout': 'Выйти',
-    'account.profile': 'Профиль',
-    'account.addresses': 'Адреса',
-    'account.security': 'Безопасность',
-    'account.save': 'Сохранить',
-    'account.saving': 'Сохранение...',
-    'account.updated': 'Профиль обновлен',
-    'account.first_name': 'Имя',
-    'account.last_name': 'Фамилия',
-    'account.birthday': 'Дата рождения',
-    'account.gender': 'Пол',
-    'account.gender.none': 'Не указан',
-    'account.gender.male': 'Мужской',
-    'account.gender.female': 'Женский',
-    'account.gender.other': 'Другой',
-    'account.newsletter': 'Подписаться на рассылку',
-    'account.language': 'Язык',
-    'account.timezone': 'Часовой пояс',
-    'account.email_info': 'Email: {value}',
-    'account.phone_info': 'Телефон: {value}',
-    'account.loyalty': 'Уровень: {level} ({points} баллов)',
-    'account.email_verified': 'Email подтвержден: {value}',
-    'account.phone_verified': 'Телефон подтвержден: {value}',
-    'account.no_email': 'Email не привязан. Обратитесь в поддержку.',
-    'account.no_phone': 'Телефон не привязан. Обратитесь в поддержку.',
-    'account.address.add_title': 'Добавить адрес',
-    'account.address.receiver_name': 'Получатель',
-    'account.address.receiver_phone': 'Телефон получателя',
-    'account.address.country': 'Страна',
-    'account.address.city': 'Город',
-    'account.address.street': 'Улица',
-    'account.address.house': 'Дом',
-    'account.address.apartment': 'Квартира',
-    'account.address.postal_code': 'Индекс',
-    'account.address.default_shipping': 'Доставка по умолчанию',
-    'account.address.default_billing': 'Оплата по умолчанию',
-    'account.address.add': 'Добавить адрес',
-    'account.address.adding': 'Добавление...',
-    'account.address.added': 'Адрес добавлен',
-    'account.address.delete': 'Удалить',
-    'toast.error': 'Произошла ошибка',
-    'theme.light': 'Светлая',
-    'theme.dark': 'Темная',
-    'theme.system': 'Системная',
-    'home.title': 'Добро пожаловать в магазин одежды',
-    'home.subtitle': 'Откройте для себя последние модные тенденции',
-    'home.shop_now': 'В магазин',
-    'home.featured': 'Рекомендуемые товары',
-    'catalog.title': 'Каталог',
-    'catalog.all': 'Все',
-    'catalog.search': 'Поиск товаров...',
-    'product.add_to_cart': 'В корзину',
-    'product.added_to_cart': 'Добавлено в корзину',
-    'product.out_of_stock': 'Нет в наличии',
-    'product.price': '{price} ₽',
-    'cart.title': 'Корзина',
-    'cart.empty': 'Корзина пуста',
-    'cart.total': 'Итого: {total} ₽',
-    'cart.checkout': 'Оформить заказ',
-    'cart.remove': 'Удалить',
-    'cart.quantity': 'Кол-во: {qty}',
-  },
-  uz: {
-    'app.name': 'Kiyim do\'koni',
-    'nav.catalog': 'Katalog',
-    'nav.cart': 'Savat',
-    'nav.signin': 'Kirish',
-    'nav.account': 'Akkaunt',
-    'nav.logout': 'Chiqish',
-    'auth.login.title': 'Kirish',
-    'auth.login.email_or_phone': 'Email yoki telefon',
-    'auth.login.password': 'Parol',
-    'auth.login.forgot': 'Parolni unutdingizmi?',
-    'auth.login.button': 'Kirish',
-    'auth.login.loading': 'Kirish...',
-    'auth.login.no_account': 'Akkauntingiz yo\'qmi?',
-    'auth.login.create': 'Yaratish',
-    'auth.login.locked': 'Akkaunt bloklangan. 15 daqiqadan so\'ng urinib ko\'ring.',
-    'auth.login.invalid': 'Noto\'g\'ri ma\'lumotlar',
-    'auth.register.title': 'Akkaunt yaratish',
-    'auth.register.email': 'Email bilan davom etish',
-    'auth.register.phone': 'Telefon bilan davom etish',
-    'auth.register.first_name': 'Ism',
-    'auth.register.last_name': 'Familiya',
-    'auth.register.email_placeholder': 'Email',
-    'auth.register.phone_placeholder': 'Telefon raqam',
-    'auth.register.send_code': 'Kodni yuborish',
-    'auth.register.sending': 'Yuborilmoqda...',
-    'auth.register.have_account': 'Akkauntingiz bormi?',
-    'auth.register.code_title': 'Kodni kiriting',
-    'auth.register.code_sent': '{target} ga 6 xonali kod yuborildi',
-    'auth.register.code_placeholder': '000000',
-    'auth.register.password': 'Parol',
-    'auth.register.password_hint': 'Kamida 8 belgi',
-    'auth.register.confirm_password': 'Parolni tasdiqlang',
-    'auth.register.verify': 'Akkaunt yaratish',
-    'auth.register.verifying': 'Tekshirilmoqda...',
-    'auth.register.back': 'Orqaga',
-    'auth.register.success': 'Ro\'yxatdan o\'tish muvaffaqiyatli. {target} ga tasdiqlash kodi yuborildi.',
-    'auth.register.resend': 'Yangi tasdiqlash kodi yuborildi.',
-    'auth.register.verified': 'Akkauntingiz muvaffaqiyatli tasdiqlandi.',
-    'auth.forgot.title': 'Parolni unutdingizmi',
-    'auth.forgot.description': 'Email yoki telefon raqamingizni kiriting.',
-    'auth.forgot.identifier': 'Email yoki telefon',
-    'auth.forgot.send': 'Kodni yuborish',
-    'auth.forgot.sending': 'Yuborilmoqda...',
-    'auth.forgot.back': 'Kirishga qaytish',
-    'auth.reset.title': 'Parolni tiklash',
-    'auth.reset.code_placeholder': '000000',
-    'auth.reset.new_password': 'Yangi parol',
-    'auth.reset.confirm_password': 'Parolni tasdiqlang',
-    'auth.reset.button': 'Parolni tiklash',
-    'auth.reset.loading': 'Tiklanmoqda...',
-    'auth.reset.sent': 'Tiklash kodi yuborildi.',
-    'auth.reset.success': 'Parol muvaffaqiyatli tiklandi.',
-    'auth.reset.done_title': 'Parol tiklandi',
-    'auth.error.passwords_mismatch': 'Parollar mos kelmaydi',
-    'auth.error.password_length': 'Parol kamida 8 belgidan iborat bo\'lishi kerak',
-    'account.title': 'Mening akkauntim',
-    'account.logout': 'Chiqish',
-    'account.profile': 'Profil',
-    'account.addresses': 'Manzillar',
-    'account.security': 'Xavfsizlik',
-    'account.save': 'Saqlash',
-    'account.saving': 'Saqlanmoqda...',
-    'account.updated': 'Profil yangilandi',
-    'account.first_name': 'Ism',
-    'account.last_name': 'Familiya',
-    'account.birthday': 'Tug\'ilgan kun',
-    'account.gender': 'Jins',
-    'account.gender.none': 'Ko\'rsatilmagan',
-    'account.gender.male': 'Erkak',
-    'account.gender.female': 'Ayol',
-    'account.gender.other': 'Boshqa',
-    'account.newsletter': 'Yangiliklarga obuna bo\'lish',
-    'account.language': 'Til',
-    'account.timezone': 'Vaqt mintaqasi',
-    'account.email_info': 'Email: {value}',
-    'account.phone_info': 'Telefon: {value}',
-    'account.loyalty': 'Daraja: {level} ({points} ball)',
-    'account.email_verified': 'Email tasdiqlangan: {value}',
-    'account.phone_verified': 'Telefon tasdiqlangan: {value}',
-    'account.no_email': 'Email bog\'lanmagan. Qo\'llab-quvvatlash xizmatiga murojaat qiling.',
-    'account.no_phone': 'Telefon bog\'lanmagan. Qo\'llab-quvvatlash xizmatiga murojaat qiling.',
-    'account.address.add_title': 'Manzil qo\'shish',
-    'account.address.receiver_name': 'Qabul qiluvchi',
-    'account.address.receiver_phone': 'Qabul qiluvchi telefoni',
-    'account.address.country': 'Davlat',
-    'account.address.city': 'Shahar',
-    'account.address.street': 'Ko\'cha',
-    'account.address.house': 'Uy',
-    'account.address.apartment': 'Xonadon',
-    'account.address.postal_code': 'Pochta indeksi',
-    'account.address.default_shipping': 'Standart yetkazib berish',
-    'account.address.default_billing': 'Standart to\'lov',
-    'account.address.add': 'Manzil qo\'shish',
-    'account.address.adding': 'Qo\'shilmoqda...',
-    'account.address.added': 'Manzil qo\'shildi',
-    'account.address.delete': 'O\'chirish',
-    'toast.error': 'Xatolik yuz berdi',
-    'theme.light': 'Yorug\'',
-    'theme.dark': 'Qorong\'i',
-    'theme.system': 'Tizim',
-    'home.title': 'Kiyim do\'koniga xush kelibsiz',
-    'home.subtitle': 'Eng so\'nggi moda trendlarini kashf eting',
-    'home.shop_now': 'Do\'konga',
-    'home.featured': 'Tavsiya etilgan mahsulotlar',
-    'catalog.title': 'Katalog',
-    'catalog.all': 'Barchasi',
-    'catalog.search': 'Mahsulotlarni qidirish...',
-    'product.add_to_cart': 'Savatga qo\'shish',
-    'product.added_to_cart': 'Savatga qo\'shildi',
-    'product.out_of_stock': 'Mavjud emas',
-    'product.price': '{price} so\'m',
-    'cart.title': 'Savat',
-    'cart.empty': 'Savat bo\'sh',
-    'cart.total': 'Jami: {total} so\'m',
-    'cart.checkout': 'Rasmiylashtirish',
-    'cart.remove': 'O\'chirish',
-    'cart.quantity': 'Soni: {qty}',
-  },
+import { useSyncExternalStore } from 'react'
+import api from './api/client'
+
+const STORAGE_KEY = 'lang'
+const CACHE_KEY = 'translations_v1'
+const FLUSH_DELAY = 400
+
+let lang = localStorage.getItem(STORAGE_KEY) || 'en'
+let translations = {}
+let version = 0
+const listeners = new Set()
+const pending = new Set()
+let flushTimer = null
+
+function emit() {
+  version++
+  for (const listener of listeners) listener()
 }
 
-const saved = localStorage.getItem('lang') || 'en'
-let currentLang = saved
+function subscribe(listener) {
+  listeners.add(listener)
+  return () => listeners.delete(listener)
+}
 
-export function t(key, params = {}) {
-  let val = translations[currentLang]?.[key] || translations.en[key] || key
+function getSnapshot() {
+  return version
+}
+
+function applyParams(text, params) {
+  if (!params) return text
+  let out = text
   for (const [k, v] of Object.entries(params)) {
-    val = val.replace(`{${k}}`, v)
+    out = out.split(`{${k}}`).join(v)
   }
-  return val
+  return out
 }
 
-export function setLanguage(lang) {
-  currentLang = lang
-  localStorage.setItem('lang', lang)
-  document.documentElement.lang = lang
+function persist() {
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify(translations))
+  } catch {
+    /* storage full/unavailable — in-memory translations still work */
+  }
 }
 
-export function getLanguage() {
-  return currentLang
+function merge(map) {
+  let changed = false
+  for (const [key, entry] of Object.entries(map)) {
+    if (!entry || typeof entry !== 'object') continue
+    if (translations[key] !== entry) {
+      translations[key] = entry
+      changed = true
+    }
+  }
+  if (changed) persist()
+  return changed
+}
+
+async function flush() {
+  flushTimer = null
+  const texts = [...pending]
+  pending.clear()
+  if (!texts.length) return
+  try {
+    const res = await api.post('/translations/sync', { texts })
+    if (merge(res.data?.translations || {})) emit()
+  } catch {
+    /* backend unreachable — keep English until next attempt */
+  }
+}
+
+function queueSync(key) {
+  pending.add(key)
+  if (!flushTimer) flushTimer = setTimeout(flush, FLUSH_DELAY)
+}
+
+function translate(key, params) {
+  const entry = translations[key]
+  const text = entry?.[lang] || key
+  if (!entry) queueSync(key)
+  return applyParams(text, params)
+}
+
+export function setLanguage(next) {
+  if (next === lang) return
+  lang = next
+  localStorage.setItem(STORAGE_KEY, next)
+  document.documentElement.lang = next
+  emit()
 }
 
 export function getLanguages() {
   return [
     { code: 'en', label: 'English' },
     { code: 'ru', label: 'Русский' },
-    { code: 'uz', label: 'O\'zbek' },
+    { code: 'uz', label: "O'zbek" },
   ]
+}
+
+export function useI18n() {
+  useSyncExternalStore(subscribe, getSnapshot)
+  return { t: translate, lang, setLanguage }
+}
+
+export async function initTranslations() {
+  try {
+    const cached = localStorage.getItem(CACHE_KEY)
+    if (cached) merge(JSON.parse(cached))
+  } catch {
+    /* corrupt cache — ignore, server data will replace it */
+  }
+  try {
+    const res = await api.get('/translations')
+    if (merge(res.data?.translations || {})) emit()
+  } catch {
+    /* backend unreachable — translations already in memory are still usable */
+  }
 }
