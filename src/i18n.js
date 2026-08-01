@@ -2,7 +2,7 @@ import { useSyncExternalStore } from 'react'
 import api from './api/client'
 
 const STORAGE_KEY = 'lang'
-const CACHE_KEY = 'translations_v1'
+const CACHE_KEY = 'translations_v2'
 const FLUSH_DELAY = 400
 
 let lang = localStorage.getItem(STORAGE_KEY) || 'en'
