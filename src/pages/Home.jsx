@@ -1,8 +1,17 @@
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import api from '../api/client'
 import { useI18n } from '../i18n'
 
 export default function Home() {
   const { t } = useI18n()
+  const [hero, setHero] = useState(null)
+
+  useEffect(() => {
+    api.get('/products/', { params: { limit: 12 } })
+      .then((r) => setHero((r.data.items || []).find((p) => p.images?.[0]?.image_url) || null))
+      .catch(() => {})
+  }, [])
   return (
     <div>
       {/* Hero */}
@@ -38,7 +47,11 @@ export default function Home() {
           </div>
           <div className="md:col-span-5 md:col-start-8 order-first md:order-none">
             <div className="relative aspect-[3/4] w-full bg-surface-muted rounded-lg overflow-hidden flex items-center justify-center">
-              <span className="material-symbols-outlined text-[48px] text-ink-muted/40">auto_awesome</span>
+              {hero ? (
+                <img src={hero.images[0].image_url} alt={hero.name} className="w-full h-full object-cover" />
+              ) : (
+                <span className="material-symbols-outlined text-[48px] text-ink-muted/40">auto_awesome</span>
+              )}
             </div>
           </div>
         </div>
