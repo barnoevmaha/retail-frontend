@@ -5,13 +5,20 @@ import { useI18n } from '../i18n'
 
 export default function Home() {
   const { t } = useI18n()
-  const [hero, setHero] = useState(null)
+  const [imgs, setImgs] = useState([])
+  const [idx, setIdx] = useState(0)
 
   useEffect(() => {
-    api.get('/products/', { params: { limit: 12 } })
-      .then((r) => setHero((r.data.items || []).find((p) => p.images?.[0]?.image_url) || null))
+    api.get('/products/', { params: { limit: 100 } })
+      .then((r) => setImgs((r.data.items || []).flatMap((p) => p.images?.[0]?.image_url ? [p.images[0].image_url] : [])))
       .catch(() => {})
   }, [])
+
+  useEffect(() => {
+    if (imgs.length < 2) return
+    const timer = setInterval(() => setIdx((i) => (i + 1) % imgs.length), 5000)
+    return () => clearInterval(timer)
+  }, [imgs])
   return (
     <div>
       {/* Hero */}
@@ -47,8 +54,28 @@ export default function Home() {
           </div>
           <div className="md:col-span-5 md:col-start-8 order-first md:order-none">
             <div className="relative aspect-[3/4] w-full bg-surface-muted rounded-lg overflow-hidden flex items-center justify-center">
-              {hero ? (
-                <img src={hero.images[0].image_url} alt={hero.name} className="w-full h-full object-cover" />
+              {imgs.length > 0 ? (
+                <div className="relative w-full h-full">
+                  {imgs.map((src, i) => (
+                    <img
+                      key={src}
+                      src={src}
+                      alt=""
+                      className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${i === idx ? 'opacity-100' : 'opacity-0'}`}
+                    />
+                  ))}
+                  {imgs.length > 1 && (
+                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                      {imgs.map((_, i) => (
+                        <button
+                          key={i}
+                          onClick={() => setIdx(i)}
+                          className={`h-1.5 rounded-full transition-all duration-300 ${i === idx ? 'w-6 bg-accent' : 'w-1.5 bg-white/50 hover:bg-white/80'}`}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
               ) : (
                 <span className="material-symbols-outlined text-[48px] text-ink-muted/40">auto_awesome</span>
               )}
