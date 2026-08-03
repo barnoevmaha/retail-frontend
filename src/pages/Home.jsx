@@ -115,7 +115,7 @@ export default function Home() {
                 className={`grid grid-cols-1 md:grid-cols-12 gap-gutter md:gap-16 items-start reveal-scroll ${visible[i] ? 'in-view' : ''}`}
               >
                 <div
-                  className={`md:col-span-5 ${flip ? 'md:col-start-8' : 'md:col-start-1'} order-2 md:order-none self-start`}
+                  className={`md:col-span-5 md:row-start-1 ${flip ? 'md:col-start-8' : 'md:col-start-1'} order-2 md:order-none self-start`}
                 >
                   <p className="eyebrow text-accent mb-4">{t(a.tag)}</p>
                   <h3 className="font-display text-headline-lg-mobile md:text-headline-lg text-ink mb-3">{t(a.title)}</h3>
@@ -123,7 +123,7 @@ export default function Home() {
                   <p className="text-body-md text-ink-muted leading-relaxed mb-10">{t(a.desc)}</p>
                   <Link to="/catalog" className="btn-ghost">{t(a.cta)}</Link>
                 </div>
-                <div className={`md:col-span-6 ${flip ? 'md:col-start-1' : 'md:col-start-7'} order-1 md:order-none self-start`}>
+                <div className={`md:col-span-6 md:row-start-1 ${flip ? 'md:col-start-1' : 'md:col-start-7'} order-1 md:order-none self-start`}>
                   <div className="relative aspect-[3/4] w-full bg-surface-muted rounded-lg overflow-hidden flex items-center justify-center">
                     {img ? (
                       <img src={img} alt={t(a.title)} className="w-full h-full object-cover" />
