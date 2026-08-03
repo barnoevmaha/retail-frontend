@@ -27,20 +27,50 @@ export default function Home() {
 
       {/* Editorial: The Journal */}
       <section className="py-24 md:py-section-padding-v">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-gutter items-center">
-          <div className="md:col-span-5 md:col-start-2 pt-12 md:pt-0 reveal-up">
-            <h2 className="font-display text-headline-lg text-ink mb-6">{t("The Journal")}</h2>
-            <h3 className="font-display text-headline-md text-ink mb-4">{t("Mastering the Monochrome")}</h3>
-            <p className="text-body-lg text-ink-muted mb-8">
-              {t("Discover the art of tonal dressing. Our latest editorial explores how varying textures and subtle shifts in shade can elevate a single-color palette from simple to profound.")}
-            </p>
+        <div className="grid grid-cols-12 gap-gutter items-end mb-14">
+          <div className="col-span-12 md:col-span-7">
+            <p className="eyebrow text-accent mb-4">{t("Editorial")}</p>
+            <h2 className="font-display text-headline-lg-mobile md:text-headline-lg text-ink">{t("The Journal")}</h2>
+          </div>
+          <div className="col-span-12 md:col-span-5 md:text-right">
             <Link to="/catalog" className="btn-ghost">{t("Read Editorial")}</Link>
           </div>
-          <div className="md:col-span-5 md:col-start-8 order-first md:order-none">
-            <div className="relative aspect-[3/4] w-full bg-surface-muted rounded-lg overflow-hidden flex items-center justify-center">
-              <span className="material-symbols-outlined text-[48px] text-ink-muted/40">auto_awesome</span>
-            </div>
-          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+          {[
+            {
+              icon: 'contrast',
+              tag: t('Style'),
+              title: t('Mastering the Monochrome'),
+              excerpt: t('Discover the art of tonal dressing. How varying textures and subtle shifts in shade elevate a single-color palette from simple to profound.'),
+            },
+            {
+              icon: 'checkroom',
+              tag: t('Craft'),
+              title: t('The Anatomy of a Shirt'),
+              excerpt: t('From collar roll to cuff, a closer look at the construction details that separate a good shirt from a great one.'),
+            },
+            {
+              icon: 'auto_awesome',
+              tag: t('Edit'),
+              title: t('Wardrobe, Edited'),
+              excerpt: t('A capsule approach to dressing — fewer, better pieces that work together across seasons, occasions, and moods.'),
+            },
+          ].map((a) => (
+            <article key={a.title} className="group reveal-up">
+              <div className="relative aspect-[3/4] bg-surface-muted rounded-lg overflow-hidden flex items-center justify-center mb-6 group-hover:bg-ink/5 transition-colors duration-700">
+                <span className="material-symbols-outlined text-[64px] text-ink-muted/25 transition-transform duration-700 group-hover:scale-110">{a.icon}</span>
+                <span className="absolute top-4 left-4 eyebrow text-accent">{a.tag}</span>
+              </div>
+              <h3 className="font-display text-headline-md text-ink mb-3 group-hover:text-accent transition-colors duration-300">{a.title}</h3>
+              <p className="text-body-md text-ink-muted">{a.excerpt}</p>
+              <span className="inline-flex items-center gap-2 mt-5 text-body-md text-accent">
+                {t('Read')}
+                <span className="material-symbols-outlined text-base transition-transform duration-300 group-hover:translate-x-1">arrow_forward</span>
+              </span>
+            </article>
+          ))}
         </div>
       </section>
 
