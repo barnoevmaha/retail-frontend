@@ -1,12 +1,56 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import api from '../api/client'
 import { useI18n } from '../i18n'
 
+const ARTICLES = [
+  {
+    tag: 'Style',
+    title: 'Mastering the Monochrome',
+    subtitle: 'The tonal palette, decoded.',
+    desc: 'Discover the art of tonal dressing. How varying textures and subtle shifts in shade elevate a single-color palette from simple to profound.',
+    cta: 'Read Editorial',
+    icon: 'contrast',
+  },
+  {
+    tag: 'Craft',
+    title: 'The Anatomy of a Shirt',
+    subtitle: 'Collar roll, placket, and the seams that hold.',
+    desc: 'From collar roll to cuff, a closer look at the construction details that separate a good shirt from a great one.',
+    cta: 'Read Article',
+    icon: 'checkroom',
+  },
+  {
+    tag: 'Edit',
+    title: 'Wardrobe, Edited',
+    subtitle: 'Fewer pieces. Better judgement.',
+    desc: 'A capsule approach to dressing — fewer, better pieces that work together across seasons, occasions, and moods.',
+    cta: 'Explore Collection',
+    icon: 'auto_awesome',
+  },
+  {
+    tag: 'Tailoring',
+    title: 'The Art of the Quiet Suit',
+    subtitle: 'Cut for stillness, worn with intent.',
+    desc: 'The restrained silhouette of the modern suit — where shoulders are soft, drape is generous, and detail lives in the seam.',
+    cta: 'Read Editorial',
+    icon: 'taunt',
+  },
+  {
+    tag: 'Fabric',
+    title: 'A Study in Wool',
+    subtitle: 'From fleece to fell to finish.',
+    desc: 'Wool is the fabric of character. We trace the journey of a single bolt — spinning, weaving, and the hand that finally shapes it.',
+    cta: 'Read Article',
+    icon: 'texture',
+  },
+]
+
 export default function Home() {
   const { t } = useI18n()
   const [imgs, setImgs] = useState([])
-  const [idx, setIdx] = useState(0)
+  const [visible, setVisible] = useState({})
+  const refs = useRef([])
 
   useEffect(() => {
     api.get('/products/', { params: { limit: 100 } })
@@ -15,10 +59,21 @@ export default function Home() {
   }, [])
 
   useEffect(() => {
-    if (imgs.length < 2) return
-    const timer = setInterval(() => setIdx((i) => (i + 1) % imgs.length), 5000)
-    return () => clearInterval(timer)
-  }, [imgs])
+    const obs = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            setVisible((v) => ({ ...v, [e.target.dataset.i]: true }))
+            obs.unobserve(e.target)
+          }
+        })
+      },
+      { threshold: 0.15 }
+    )
+    refs.current.forEach((el) => el && obs.observe(el))
+    return () => obs.disconnect()
+  }, [])
+
   return (
     <div>
       {/* Hero */}
@@ -42,45 +97,44 @@ export default function Home() {
       </section>
 
       {/* Editorial: The Journal */}
-      <section className="py-24 md:py-section-padding-v">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-gutter items-center">
-          <div className="md:col-span-5 md:col-start-2 pt-12 md:pt-0 reveal-up">
-            <h2 className="font-display text-headline-lg text-ink mb-6">{t("The Journal")}</h2>
-            <h3 className="font-display text-headline-md text-ink mb-4">{t("Mastering the Monochrome")}</h3>
-            <p className="text-body-lg text-ink-muted mb-8">
-              {t("Discover the art of tonal dressing. Our latest editorial explores how varying textures and subtle shifts in shade can elevate a single-color palette from simple to profound.")}
-            </p>
-            <Link to="/catalog" className="btn-ghost">{t("Read Editorial")}</Link>
-          </div>
-          <div className="md:col-span-5 md:col-start-8 order-first md:order-none">
-            <div className="relative aspect-[3/4] w-full bg-surface-muted rounded-lg overflow-hidden flex items-center justify-center">
-              {imgs.length > 0 ? (
-                <div className="relative w-full h-full">
-                  {imgs.map((src, i) => (
-                    <img
-                      key={src}
-                      src={src}
-                      alt=""
-                      className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${i === idx ? 'opacity-100' : 'opacity-0'}`}
-                    />
-                  ))}
-                  {imgs.length > 1 && (
-                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-                      {imgs.map((_, i) => (
-                        <button
-                          key={i}
-                          onClick={() => setIdx(i)}
-                          className={`h-1.5 rounded-full transition-all duration-300 ${i === idx ? 'w-6 bg-accent' : 'w-1.5 bg-white/50 hover:bg-white/80'}`}
-                        />
-                      ))}
-                    </div>
-                  )}
+      <section className="py-24 md:py-40">
+        <div className="max-w-2xl mb-24 md:mb-36">
+          <p className="eyebrow text-accent mb-4">{t("Editorial")}</p>
+          <h2 className="font-display text-headline-lg-mobile md:text-headline-lg text-ink">{t("The Journal")}</h2>
+        </div>
+
+        <div className="flex flex-col gap-[100px] md:gap-[160px]">
+          {ARTICLES.map((a, i) => {
+            const flip = i % 2 === 1
+            const img = imgs[i]
+            return (
+              <section
+                key={a.title}
+                data-i={i}
+                ref={(el) => (refs.current[i] = el)}
+                className={`grid grid-cols-1 md:grid-cols-12 gap-gutter md:gap-16 items-center reveal-scroll ${visible[i] ? 'in-view' : ''}`}
+              >
+                <div
+                  className={`md:col-span-5 ${flip ? 'md:col-start-8' : 'md:col-start-1'} order-2 md:order-none`}
+                >
+                  <p className="eyebrow text-accent mb-4">{t(a.tag)}</p>
+                  <h3 className="font-display text-headline-lg-mobile md:text-headline-lg text-ink mb-3">{t(a.title)}</h3>
+                  <p className="font-display text-headline-md text-ink-muted mb-5">{t(a.subtitle)}</p>
+                  <p className="text-body-md text-ink-muted leading-relaxed mb-10">{t(a.desc)}</p>
+                  <Link to="/catalog" className="btn-ghost">{t(a.cta)}</Link>
                 </div>
-              ) : (
-                <span className="material-symbols-outlined text-[48px] text-ink-muted/40">auto_awesome</span>
-              )}
-            </div>
-          </div>
+                <div className={`md:col-span-6 ${flip ? 'md:col-start-1' : 'md:col-start-7'} order-1 md:order-none`}>
+                  <div className="relative aspect-[3/4] w-full bg-surface-muted rounded-lg overflow-hidden flex items-center justify-center">
+                    {img ? (
+                      <img src={img} alt={t(a.title)} className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="material-symbols-outlined text-[64px] text-ink-muted/25">{a.icon}</span>
+                    )}
+                  </div>
+                </div>
+              </section>
+            )
+          })}
         </div>
       </section>
 

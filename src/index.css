@@ -285,3 +285,17 @@ h1, h2, h3 {
   .reveal-up, .animate-slide-up { animation: none; opacity: 1; transform: none; }
   .product-image, .hover-lift { transition: none; }
 }
+
+/* scroll-triggered editorial reveal */
+.reveal-scroll {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal-scroll.in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal-scroll { opacity: 1; transform: none; transition: none; }
+}
