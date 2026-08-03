@@ -112,7 +112,7 @@ export default function Home() {
                 key={a.title}
                 data-i={i}
                 ref={(el) => (refs.current[i] = el)}
-                className={`grid grid-cols-1 md:grid-cols-12 gap-gutter md:gap-16 items-center reveal-scroll ${visible[i] ? 'in-view' : ''}`}
+                className={`grid grid-cols-1 md:grid-cols-12 gap-gutter md:gap-16 items-start reveal-scroll ${visible[i] ? 'in-view' : ''}`}
               >
                 <div
                   className={`md:col-span-5 ${flip ? 'md:col-start-8' : 'md:col-start-1'} order-2 md:order-none`}
