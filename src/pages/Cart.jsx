@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import api from '../api/client'
 import { useCart } from '../context/CartContext'
+import { useAuth } from '../context/AuthContext'
 import { useI18n } from '../i18n'
 
 export default function Cart() {
   const { t } = useI18n()
+  const navigate = useNavigate()
+  const { customer } = useAuth()
   const [items, setItems] = useState([])
   const [total, setTotal] = useState(0)
   const { refresh } = useCart()
@@ -106,7 +109,7 @@ export default function Cart() {
                 <span className="font-display text-body-lg text-ink font-medium">{t("Total")}</span>
                 <span className="font-display text-headline-md text-ink">${total.toFixed(2)}</span>
               </div>
-              <button className="btn-primary w-full py-5">
+              <button className="btn-primary w-full py-5" onClick={() => { if (!customer) navigate('/login') }}>
                 {t("Proceed to Secure Checkout")}
                 <span className="material-symbols-outlined text-[20px]">lock</span>
               </button>
