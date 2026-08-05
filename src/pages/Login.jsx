@@ -24,7 +24,7 @@ export default function Login() {
       const res = await api.post('/customer/auth/login', { login, password })
       authLogin(res.data.access_token, res.data.customer)
       toast?.addToast('Welcome back!', 'success')
-      navigate('/account')
+      navigate('/')
     } catch (err) {
       if (err.response?.status === 423) {
         setError(t("Account is locked. Try again in 15 minutes."))
