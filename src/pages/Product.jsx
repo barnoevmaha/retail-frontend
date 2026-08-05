@@ -40,8 +40,8 @@ export default function Product() {
         {/* Gallery */}
         <div className="lg:col-span-7">
           <div className="relative aspect-[3/4] w-full bg-surface-muted rounded-lg overflow-hidden group">
-            {variant?.image_url ? (
-              <img src={variant.image_url} alt={product.name} className="w-full h-full object-cover product-image" />
+            {variant?.image_url || product.images?.[0]?.image_url ? (
+              <img src={variant?.image_url || product.images?.[0]?.image_url} alt={product.name} className="w-full h-full object-cover product-image" />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
                 <span className="font-display text-display-lg text-ink-muted/20 uppercase tracking-tighter">{product.name.charAt(0)}</span>
