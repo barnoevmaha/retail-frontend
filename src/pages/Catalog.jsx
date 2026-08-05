@@ -9,6 +9,11 @@ export default function Catalog() {
   const [categories, setCategories] = useState([])
   const [selectedCat, setSelectedCat] = useState('')
 
+  const catLabel = (c) => {
+    const tr = t(`category.${c.slug}`)
+    return tr === `category.${c.slug}` ? c.name : tr
+  }
+
   useEffect(() => {
     api.get('/products/').then((r) => setProducts(r.data.items || [])).catch(() => {})
     api.get('/categories/').then((r) => setCategories(r.data || [])).catch(() => {})
@@ -40,7 +45,7 @@ export default function Catalog() {
             onClick={() => setSelectedCat(c.id.toString())}
             className={`eyebrow px-5 py-2.5 border transition-colors duration-300 ${selectedCat === c.id.toString() ? 'bg-ink text-bg border-ink' : 'border-border/60 text-ink-muted hover:text-ink hover:border-ink/50'}`}
           >
-            {c.name}
+            {catLabel(c)}
           </button>
         ))}
       </div>
@@ -65,7 +70,7 @@ export default function Catalog() {
                 <div className="absolute inset-0 bg-gradient-to-t from-bg/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </div>
               <div className="flex flex-col gap-1">
-                <span className="eyebrow text-ink-muted">{p.category_name || t("Catalog")}</span>
+                <span className="eyebrow text-ink-muted">{p.category_slug ? (t(`category.${p.category_slug}`) === `category.${p.category_slug}` ? p.category_name : t(`category.${p.category_slug}`)) : (p.category_name || t("Catalog"))}</span>
                 <h3 className="font-display text-body-lg text-ink font-medium truncate">{p.name}</h3>
                 <span className="text-body-md text-ink-muted">{price ? `$${price}` : ''}</span>
               </div>

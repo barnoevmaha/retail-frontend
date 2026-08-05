@@ -54,7 +54,7 @@ export default function Product() {
         <div className="lg:col-span-5">
           <div className="lg:sticky lg:top-32 flex flex-col gap-10">
             <div className="flex flex-col gap-3">
-              <p className="eyebrow text-ink-muted">{product.category_name || t("Catalog")}</p>
+              <p className="eyebrow text-ink-muted">{product.category_slug ? (t(`category.${product.category_slug}`) === `category.${product.category_slug}` ? product.category_name : t(`category.${product.category_slug}`)) : (product.category_name || t("Catalog"))}</p>
               <h1 className="font-display text-headline-lg-mobile md:text-headline-lg text-ink tracking-tight">{product.name}</h1>
               {variant && (
                 <p className="text-body-lg text-ink-muted">${variant.selling_price} USD</p>
