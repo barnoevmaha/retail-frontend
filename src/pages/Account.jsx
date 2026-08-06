@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation, Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
 import api from '../api/client'
 import { useI18n } from '../i18n'
+import { orderStatus } from '../utils/orders'
 
 const inputCls = 'input-line'
 
@@ -17,6 +18,8 @@ export default function Account() {
   const [tab, setTab] = useState('profile')
   const [profile, setProfile] = useState({ first_name: '', last_name: '', birthday: '', gender: '', newsletter: false, language: 'en', timezone: 'UTC' })
   const [addresses, setAddresses] = useState([])
+  const [orders, setOrders] = useState([])
+  const [ordersLoading, setOrdersLoading] = useState(false)
   const [addressForm, setAddressForm] = useState({ receiver_name: '', receiver_phone: '', country: '', city: '', street: '', house: '', apartment: '', postal_code: '', is_default_shipping: false, is_default_billing: false })
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
@@ -69,8 +72,15 @@ export default function Account() {
   const navItems = [
     { id: 'profile', label: t("Profile"), icon: 'person' },
     { id: 'addresses', label: t("Addresses"), icon: 'location_on' },
+    { id: 'orders', label: t("Orders"), icon: 'receipt_long' },
     { id: 'security', label: t("Security"), icon: 'manage_accounts' },
   ]
+
+  useEffect(() => {
+    if (tab !== 'orders' || !customer) return
+    setOrdersLoading(true)
+    api.get('/customer/orders').then((r) => setOrders(r.data || [])).catch(() => {}).finally(() => setOrdersLoading(false))
+  }, [tab, customer])
 
   return (
     <div className="flex flex-col md:flex-row gap-gutter">
@@ -193,6 +203,43 @@ export default function Account() {
                 <button onClick={() => deleteAddress(a.id)} className="eyebrow text-danger hover:opacity-75 transition-opacity">{t("Delete")}</button>
               </div>
             ))}
+          </div>
+        )}
+
+        {tab === 'orders' && (
+          <div>
+            {ordersLoading ? (
+              <p className="py-16 text-center text-body-md text-ink-muted">{t("Loading...")}</p>
+            ) : orders.length === 0 ? (
+              <div className="py-24 text-center">
+                <span className="material-symbols-outlined text-[56px] text-ink-muted/30 block mb-6">receipt_long</span>
+                <p className="text-body-lg text-ink-muted mb-10">{t("No orders yet")}</p>
+                <Link to="/catalog" className="btn-primary">{t("Explore Collection")}</Link>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-6">
+                {orders.map((o) => (
+                  <Link
+                    key={o.id}
+                    to={`/orders/${o.id}`}
+                    className="glass-panel rounded-xl p-6 flex flex-col sm:flex-row gap-4 sm:items-center justify-between hover-lift"
+                  >
+                    <div>
+                      <p className="font-display text-body-lg text-ink">{t("Order #")}{o.id}</p>
+                      <p className="text-body-sm text-ink-muted mt-1">
+                        {o.created_at ? new Date(o.created_at).toLocaleDateString() : ''}
+                        {' · '}{o.items.length} {t("Items")}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-6">
+                      <span className="eyebrow text-accent">{orderStatus(o.status, t)}</span>
+                      <span className="font-display text-body-md text-ink">${Number(o.total_amount || 0).toFixed(2)}</span>
+                      <span className="material-symbols-outlined text-[18px] text-ink-muted">arrow_forward</span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
         )}
 

@@ -16,6 +16,8 @@ import Login from './pages/Login'
 import Register from './pages/Register'
 import ForgotPassword from './pages/ForgotPassword'
 import Account from './pages/Account'
+import OrderConfirmation from './pages/OrderConfirmation'
+import OrderDetails from './pages/OrderDetails'
 import Market from './pages/Market'
 import { useI18n } from './i18n'
 
@@ -72,6 +74,8 @@ export default function App() {
                     <Route path="register" element={<Register />} />
                     <Route path="forgot-password" element={<ForgotPassword />} />
                     <Route path="account" element={<Account />} />
+                    <Route path="order-confirmation" element={<OrderConfirmation />} />
+                    <Route path="orders/:id" element={<OrderDetails />} />
                     <Route path="market" element={<Market />} />
                   </Routes>
                 </main>

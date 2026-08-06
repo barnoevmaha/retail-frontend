@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import api from '../api/client'
 import { useCart } from '../context/CartContext'
+import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
 import { useI18n } from '../i18n'
 
@@ -19,6 +20,7 @@ export default function Checkout() {
   const navigate = useNavigate()
   const toast = useToast()
   const { refresh } = useCart()
+  const { customer } = useAuth()
   const [items, setItems] = useState([])
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
@@ -35,11 +37,11 @@ export default function Checkout() {
     if (placing || items.length === 0) return
     setPlacing(true)
     try {
-      await api.post('/checkout/', { payment_method: 'card', session_key: sessionKey() },
-        { headers: { 'X-Session-Key': sessionKey() } })
+      const headers = { 'X-Session-Key': sessionKey() }
+      if (customer?.id) headers['X-Customer-Id'] = String(customer.id)
+      const res = await api.post('/checkout/', { payment_method: 'card', session_key: sessionKey() }, { headers })
       refresh()
-      toast?.addToast(t("Order placed successfully"), 'success')
-      navigate('/')
+      navigate('/order-confirmation', { state: { order: res.data } })
     } catch (err) {
       toast?.addToast(err.response?.data?.detail || t("Checkout failed. Please try again."), 'error')
       setPlacing(false)
