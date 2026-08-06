@@ -13,26 +13,43 @@ function sessionKey() {
 }
 
 export function CartProvider({ children }) {
-  const [count, setCount] = useState(0)
-  const [refresh, setRefresh] = useState(0)
+  const [items, setItems] = useState([])
+  const [total, setTotal] = useState(0)
 
-  useEffect(() => {
-    api.get('/cart/', { headers: { 'X-Session-Key': sessionKey() } })
-      .then((r) => {
-        const total = r.data.items.reduce((s, i) => s + i.quantity, 0)
-        setCount(total)
-      })
-      .catch(() => {})
-  }, [refresh])
-
-  const addToCart = async (variantId, quantity = 1) => {
-    await api.post('/cart/items', { variant_id: variantId, quantity },
-      { headers: { 'X-Session-Key': sessionKey() } })
-    setRefresh((r) => r + 1)
+  const apply = (r) => {
+    setItems(r.data.items || [])
+    setTotal(r.data.total || 0)
   }
 
+  const refresh = () =>
+    api.get('/cart/', { headers: { 'X-Session-Key': sessionKey() } })
+      .then((r) => { setItems(r.data.items || []); setTotal(r.data.total || 0) })
+      .catch(() => {})
+
+  useEffect(() => { refresh() }, [])
+
+  const addToCart = async (variantId, quantity = 1) => {
+    const r = await api.post('/cart/items', { variant_id: variantId, quantity },
+      { headers: { 'X-Session-Key': sessionKey() } })
+    apply(r)
+  }
+
+  const updateQuantity = async (itemId, quantity) => {
+    const r = await api.put(`/cart/items/${itemId}`, { quantity },
+      { headers: { 'X-Session-Key': sessionKey() } })
+    apply(r)
+  }
+
+  const removeItem = async (itemId) => {
+    const r = await api.delete(`/cart/items/${itemId}`,
+      { headers: { 'X-Session-Key': sessionKey() } })
+    apply(r)
+  }
+
+  const count = items.reduce((s, i) => s + i.quantity, 0)
+
   return (
-    <CartContext.Provider value={{ count, addToCart, refresh: () => setRefresh((r) => r + 1) }}>
+    <CartContext.Provider value={{ items, total, count, addToCart, updateQuantity, removeItem, refresh }}>
       {children}
     </CartContext.Provider>
   )

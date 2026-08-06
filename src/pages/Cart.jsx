@@ -1,57 +1,27 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import api from '../api/client'
 import { useCart } from '../context/CartContext'
 import { useToast } from '../context/ToastContext'
 import { useI18n } from '../i18n'
-
-function sessionKey() {
-  let key = sessionStorage.getItem('session_key')
-  if (!key) {
-    key = 'guest_' + Math.random().toString(36).slice(2)
-    sessionStorage.setItem('session_key', key)
-  }
-  return key
-}
 
 export default function Cart() {
   const { t } = useI18n()
   const navigate = useNavigate()
   const toast = useToast()
-  const [items, setItems] = useState([])
-  const [total, setTotal] = useState(0)
   const [qtyLoading, setQtyLoading] = useState(null)
   const [checkoutLoading, setCheckoutLoading] = useState(false)
-  const { refresh } = useCart()
-
-  const load = () => {
-    api.get('/cart/', { headers: { 'X-Session-Key': sessionKey() } })
-      .then((r) => { setItems(r.data.items || []); setTotal(r.data.total || 0) })
-      .catch(() => {})
-  }
-  useEffect(() => { load() }, [])
+  const { items, total, updateQuantity, removeItem } = useCart()
 
   const changeQty = async (item, qty) => {
     if (qty < 1 || qty === item.quantity || qtyLoading) return
     setQtyLoading(item.id)
     try {
-      const r = await api.put(`/cart/items/${item.id}`, { quantity: qty }, { headers: { 'X-Session-Key': sessionKey() } })
-      setItems(r.data.items || [])
-      setTotal(r.data.total || 0)
-      refresh()
+      await updateQuantity(item.id, qty)
     } catch (err) {
       toast?.addToast(err.response?.data?.detail || t("Could not update quantity"), 'error')
     } finally {
       setQtyLoading(null)
     }
-  }
-
-  const removeItem = async (itemId) => {
-    try {
-      await api.delete(`/cart/items/${itemId}`, { headers: { 'X-Session-Key': sessionKey() } })
-      setItems(items.filter((i) => i.id !== itemId))
-      refresh()
-    } catch {}
   }
 
   const goCheckout = () => {

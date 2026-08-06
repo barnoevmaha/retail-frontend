@@ -25,8 +25,10 @@ export default function Product() {
     setClosing(true)
     setTimeout(() => { setSizeOpen(false); setClosing(false) }, 260)
   }
-  const { addToCart } = useCart()
+  const { items, addToCart } = useCart()
   const toast = useToast()
+
+  const inCart = items.find((i) => i.variant_id === variant?.id)?.quantity || 0
 
   const colorOf = (v) => v && (v.color_name || v.color || null)
 
@@ -69,8 +71,12 @@ export default function Product() {
 
   const handleAdd = async () => {
     if (!variant) return
-    await addToCart(variant.id, 1)
-    toast?.addToast(t("Added to cart"), 'success')
+    try {
+      await addToCart(variant.id, 1)
+      toast?.addToast(t("Added to cart"), 'success')
+    } catch (err) {
+      toast?.addToast(err.response?.data?.detail || t("Could not add to cart"), 'error')
+    }
   }
 
   const handleFav = async () => {
@@ -229,6 +235,12 @@ export default function Product() {
 
             {/* Actions */}
             <div className="flex flex-col gap-4 mt-2">
+              {inCart > 0 && (
+                <p className="eyebrow text-ink-muted flex items-center gap-2">
+                  <span className="material-symbols-outlined text-[16px]">shopping_bag</span>
+                  {t("In cart: {n}", { n: inCart })}
+                </p>
+              )}
               {variant && variant.quantity > 0 ? (
                 <button onClick={handleAdd} className="btn-primary w-full py-5">
                   <span className="material-symbols-outlined text-[18px]">shopping_bag</span>
