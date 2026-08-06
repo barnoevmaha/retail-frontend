@@ -9,14 +9,15 @@ import { useFavorites } from '../context/FavoritesContext'
 import { useI18n } from '../i18n'
 
 export default function Product() {
-  const { t } = useI18n()
-  const navigate = useNavigate()
   const { slug } = useParams()
+  const { t } = useI18n()
+  const { addToCart, items } = useCart()
   const { customer } = useAuth()
-  const { faves, toggle: toggleFav } = useFavorites()
+  const toast = useToast()
   const [product, setProduct] = useState(null)
   const [color, setColor] = useState(null)
   const [size, setSize] = useState(null)
+  const [imgIdx, setImgIdx] = useState(0)
   const [hoverColor, setHoverColor] = useState(null)
   const [sizeOpen, setSizeOpen] = useState(false)
   const [closing, setClosing] = useState(false)
@@ -25,8 +26,6 @@ export default function Product() {
     setClosing(true)
     setTimeout(() => { setSizeOpen(false); setClosing(false) }, 260)
   }
-  const { items, addToCart } = useCart()
-  const toast = useToast()
 
   const colorOf = (v) => v && (v.color_name || v.color || null)
 
@@ -51,10 +50,22 @@ export default function Product() {
   const productImg = product.images?.find((i) => variant?.color_id && i.color_id === variant.color_id)?.image_url
     || product.images?.[0]?.image_url
 
+  const colorImages = (() => {
+    const imgs = (product.images || []).filter((i) => variant?.color_id && i.color_id === variant.color_id)
+    if (imgs.length) return [...imgs].sort((a, b) => (b.is_main ? 1 : 0) - (a.is_main ? 1 : 0))
+    return []
+  })()
+  const galleryImages = colorImages.length
+    ? colorImages
+    : (product.images || []).filter((i) => !i.color_id || !variant?.color_id)
+  const shown = galleryImages.length ? galleryImages[Math.min(imgIdx, galleryImages.length - 1)] : null
+  const currentImg = shown?.image_url || variant?.image_url || productImg
+
   const inCart = items.find((i) => i.variant_id === variant?.id)?.quantity || 0
 
   const selectColor = (c) => {
     setColor(c)
+    setImgIdx(0)
     if (!product.variants.find((v) => colorOf(v) === c && v.size === size)) {
       const firstOfColor = product.variants.find((v) => colorOf(v) === c)
       if (firstOfColor) setSize(firstOfColor.size)
@@ -63,6 +74,7 @@ export default function Product() {
 
   const selectSize = (s) => {
     setSize(s)
+    setImgIdx(0)
     if (!product.variants.find((v) => colorOf(v) === color && v.size === s)) {
       const firstWithSize = product.variants.find((v) => v.size === s)
       if (firstWithSize) setColor(colorOf(firstWithSize))
@@ -98,8 +110,8 @@ export default function Product() {
         {/* Gallery */}
         <div className="lg:col-span-7">
           <div className="relative aspect-[3/4] w-full bg-surface-muted rounded-lg overflow-hidden group">
-            {variant?.image_url || productImg ? (
-              <img src={variant?.image_url || productImg} alt={product.name} className="w-full h-full object-cover product-image" />
+            {currentImg ? (
+              <img src={currentImg} alt={product.name} className="w-full h-full object-cover product-image" />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
                 <span className="font-display text-display-lg text-ink-muted/20 uppercase tracking-tighter">{product.name.charAt(0)}</span>
@@ -114,6 +126,20 @@ export default function Product() {
               <span className={`material-symbols-outlined text-[22px] ${faves.has(product.id) ? 'filled' : ''}`}>{faves.has(product.id) ? 'favorite' : 'favorite_border'}</span>
             </button>
           </div>
+          {galleryImages.length > 1 && (
+            <div className="flex gap-3 mt-4 overflow-x-auto pb-1">
+              {galleryImages.map((img, i) => (
+                <button
+                  key={img.id}
+                  type="button"
+                  onClick={() => setImgIdx(i)}
+                  className={`w-20 h-24 flex-shrink-0 rounded-md overflow-hidden border-2 transition-colors ${i === Math.min(imgIdx, galleryImages.length - 1) ? 'border-accent' : 'border-transparent opacity-70 hover:opacity-100'}`}
+                >
+                  <img src={img.image_url} alt="" className="w-full h-full object-cover" />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Sticky info panel */}

@@ -5,6 +5,7 @@ import { useCart } from '../context/CartContext'
 import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
 import { useI18n } from '../i18n'
+import MapPicker from '../components/MapPicker'
 
 function sessionKey() {
   let key = sessionStorage.getItem('session_key')
@@ -31,8 +32,9 @@ export default function Checkout() {
   const [subtotal, setSubtotal] = useState(0)
   const [loading, setLoading] = useState(true)
   const [placing, setPlacing] = useState(false)
-  const [form, setForm] = useState({ full_name: '', phone: '', city: '', address: '', apartment: '', delivery_note: '', save_address: false })
+  const [form, setForm] = useState({ full_name: '', phone: '', city: '', address: '', apartment: '', delivery_note: '', save_address: false, latitude: null, longitude: null })
   const [errors, setErrors] = useState({})
+  const [showMap, setShowMap] = useState(false)
 
   useEffect(() => {
     api.get('/cart/', { headers: { 'X-Session-Key': sessionKey() } })
@@ -73,8 +75,10 @@ export default function Checkout() {
         phone: form.phone.trim(),
         city: form.city.trim(),
         address: form.address.trim(),
-        apartment: form.apartment.trim() || null,
+        apartment: form.apartment.trim() || '',
         delivery_note: form.delivery_note.trim() || null,
+        latitude: form.latitude,
+        longitude: form.longitude,
       }, { headers })
       if (customer?.id && form.save_address) {
         api.post('/customer/account/addresses', {
@@ -92,6 +96,22 @@ export default function Checkout() {
     } catch (err) {
       toast?.addToast(err.response?.data?.detail || t('Checkout failed. Please try again.'), 'error')
       setPlacing(false)
+    }
+  }
+
+  const pickLocation = async (lat, lon) => {
+    setShowMap(false)
+    setForm({ ...form, latitude: lat, longitude: lon })
+    try {
+      const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`, { headers: { 'Accept': 'application/json' } })
+      const data = await res.json()
+      const a = data.address || {}
+      const road = [a.road || a.pedestrian || '', a.house_number || ''].filter(Boolean).join(' ')
+      const city = a.city || a.town || a.village || a.county || form.city
+      if (road) setForm((f) => ({ ...f, address: road, city, latitude: lat, longitude: lon }))
+      else setForm((f) => ({ ...f, latitude: lat, longitude: lon }))
+    } catch {
+      toast?.addToast(t('Location set. Adjust the address fields if needed.'), 'info')
     }
   }
 
@@ -141,8 +161,20 @@ export default function Checkout() {
             </div>
             <div className="sm:col-span-2">
               <label className="block eyebrow text-ink-muted mb-1.5">{t('Delivery Address')} *</label>
-              <input type="text" className={inputCls} value={form.address} onChange={set('address')} placeholder={t('Street, house number')} />
+              <div className="flex gap-2">
+                <input type="text" className={inputCls} value={form.address} onChange={set('address')} placeholder={t('Street, house number')} />
+                <button type="button" onClick={() => setShowMap(true)} className="btn-ghost shrink-0 flex items-center gap-2 px-4 text-body-sm">
+                  <span className="material-symbols-outlined text-[18px]">map</span>
+                  {t('Choose on map')}
+                </button>
+              </div>
               {errors.address && <p className={errCls}>{errors.address}</p>}
+              {form.latitude && form.longitude && (
+                <p className="text-body-xs text-ink-muted mt-1.5 flex items-center gap-1.5">
+                  <span className="material-symbols-outlined text-[14px]">my_location</span>
+                  Pin: {form.latitude.toFixed(5)}, {form.longitude.toFixed(5)}
+                </p>
+              )}
             </div>
             <div className="sm:col-span-2">
               <label className="block eyebrow text-ink-muted mb-1.5">{t('Delivery Note (optional)')}</label>
@@ -212,6 +244,7 @@ export default function Checkout() {
           </div>
         </aside>
       </div>
+      {showMap && <MapPicker lat={form.latitude} lon={form.longitude} onClose={() => setShowMap(false)} onPick={pickLocation} />}
     </div>
   )
 }

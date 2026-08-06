@@ -109,6 +109,19 @@ export default function OrderDetails() {
             {order.customer_phone && <p><span className="eyebrow text-ink block mb-1">{t("Phone")}</span>{order.customer_phone}</p>}
             {order.city && <p><span className="eyebrow text-ink block mb-1">{t("City")}</span>{order.city}</p>}
             {order.address && <p><span className="eyebrow text-ink block mb-1">{t("Address")}</span>{order.address}{order.apartment ? `, ${order.apartment}` : ''}</p>}
+            {order.latitude != null && order.longitude != null && (
+              <p>
+                <span className="eyebrow text-ink block mb-1">{t("Location")}</span>
+                <a
+                  href={`https://www.openstreetmap.org/?mlat=${order.latitude}&mlon=${order.longitude}#map=17/${order.latitude}/${order.longitude}`}
+                  target="_blank" rel="noreferrer"
+                  className="inline-flex items-center gap-1.5 text-accent hover:underline"
+                >
+                  <span className="material-symbols-outlined text-[16px]">map</span>
+                  {t("View on map")}
+                </a>
+              </p>
+            )}
           </div>
           {order.delivery_note && (
             <p className="mt-5 text-body-md text-ink-muted"><span className="eyebrow text-ink block mb-1">{t("Delivery Note")}</span>{order.delivery_note}</p>
