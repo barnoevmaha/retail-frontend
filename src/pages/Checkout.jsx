@@ -82,7 +82,7 @@ export default function Checkout() {
           receiver_phone: form.phone.trim(),
           city: form.city.trim(),
           street: form.address.trim(),
-          apartment: form.apartment.trim() || null,
+          apartment: form.apartment.trim(),
           is_default_shipping: false,
           is_default_billing: false,
         }).catch(() => {})
