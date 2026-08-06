@@ -230,6 +230,9 @@ export default function Account() {
                         {o.created_at ? new Date(o.created_at).toLocaleDateString() : ''}
                         {' · '}{o.items.length} {t("Items")}
                       </p>
+                      {(o.city || o.address) && (
+                        <p className="text-body-sm text-ink-muted mt-0.5">{o.city}{o.city && o.address ? ', ' : ''}{o.address}</p>
+                      )}
                     </div>
                     <div className="flex items-center gap-6">
                       <span className="eyebrow text-accent">{orderStatus(o.status, t)}</span>

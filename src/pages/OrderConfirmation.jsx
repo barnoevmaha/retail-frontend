@@ -20,6 +20,9 @@ export default function OrderConfirmation() {
         <p className="text-body-lg text-ink-muted">
           {t("Order #")}{order.id} — <span className="text-accent">{orderStatus(order.status, t)}</span>
         </p>
+        <p className="text-body-sm text-ink-muted mt-3">
+          {order.created_at ? new Date(order.created_at).toLocaleString() : ''}
+        </p>
       </div>
 
       <div className="glass-panel rounded-xl p-8 mb-10">
@@ -56,6 +59,21 @@ export default function OrderConfirmation() {
           <span className="font-display text-headline-md text-ink">${Number(order.total_amount || 0).toFixed(2)}</span>
         </div>
       </div>
+
+      {(order.customer_name || order.city || order.address || order.customer_phone) && (
+        <div className="glass-panel rounded-xl p-8 mb-10">
+          <h2 className="font-display text-headline-md text-ink mb-6">{t("Delivery Information")}</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 text-body-md text-ink-muted">
+            {order.customer_name && <p><span className="eyebrow text-ink block mb-1">{t("Recipient")}</span>{order.customer_name}</p>}
+            {order.customer_phone && <p><span className="eyebrow text-ink block mb-1">{t("Phone")}</span>{order.customer_phone}</p>}
+            {order.city && <p><span className="eyebrow text-ink block mb-1">{t("City")}</span>{order.city}</p>}
+            {order.address && <p><span className="eyebrow text-ink block mb-1">{t("Address")}</span>{order.address}{order.apartment ? `, ${order.apartment}` : ''}</p>}
+          </div>
+          {order.delivery_note && (
+            <p className="mt-5 text-body-md text-ink-muted"><span className="eyebrow text-ink block mb-1">{t("Delivery Note")}</span>{order.delivery_note}</p>
+          )}
+        </div>
+      )}
 
       <div className="flex flex-col sm:flex-row gap-4 justify-center">
         {order.customer_id ? (

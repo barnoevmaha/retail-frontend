@@ -100,6 +100,21 @@ export default function OrderDetails() {
           <p>#{order.id}</p>
         </div>
       </div>
+
+      {(order.customer_name || order.city || order.address || order.customer_phone) && (
+        <div className="glass-panel rounded-xl p-8 mt-10">
+          <h2 className="font-display text-headline-md text-ink mb-6">{t("Delivery Information")}</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 text-body-md text-ink-muted">
+            {order.customer_name && <p><span className="eyebrow text-ink block mb-1">{t("Recipient")}</span>{order.customer_name}</p>}
+            {order.customer_phone && <p><span className="eyebrow text-ink block mb-1">{t("Phone")}</span>{order.customer_phone}</p>}
+            {order.city && <p><span className="eyebrow text-ink block mb-1">{t("City")}</span>{order.city}</p>}
+            {order.address && <p><span className="eyebrow text-ink block mb-1">{t("Address")}</span>{order.address}{order.apartment ? `, ${order.apartment}` : ''}</p>}
+          </div>
+          {order.delivery_note && (
+            <p className="mt-5 text-body-md text-ink-muted"><span className="eyebrow text-ink block mb-1">{t("Delivery Note")}</span>{order.delivery_note}</p>
+          )}
+        </div>
+      )}
     </div>
   )
 }
