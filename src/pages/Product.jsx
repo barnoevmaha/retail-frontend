@@ -28,8 +28,6 @@ export default function Product() {
   const { items, addToCart } = useCart()
   const toast = useToast()
 
-  const inCart = items.find((i) => i.variant_id === variant?.id)?.quantity || 0
-
   const colorOf = (v) => v && (v.color_name || v.color || null)
 
   useEffect(() => {
@@ -52,6 +50,8 @@ export default function Product() {
     || product.variants[0]
   const productImg = product.images?.find((i) => variant?.color_id && i.color_id === variant.color_id)?.image_url
     || product.images?.[0]?.image_url
+
+  const inCart = items.find((i) => i.variant_id === variant?.id)?.quantity || 0
 
   const selectColor = (c) => {
     setColor(c)
