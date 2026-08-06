@@ -45,11 +45,7 @@ const ProductCard = ({ p, label }) => {
           type="button"
           onClick={handleFav}
           aria-label={t("Toggle favorite")}
-          className={`absolute top-3 right-3 w-10 h-10 rounded-full backdrop-blur-sm flex items-center justify-center border transition-colors ${
-            faves.has(p.id)
-              ? 'bg-danger text-bg border-danger shadow-lg shadow-danger/30'
-              : 'bg-bg/85 border-border/10 text-ink hover:border-ink'
-          }`}
+          className={`absolute top-3 right-3 w-10 h-10 rounded-full bg-bg/85 backdrop-blur-sm flex items-center justify-center border border-border/10 transition-colors ${faves.has(p.id) ? 'text-danger' : 'text-ink hover:border-ink'}`}
         >
           <span className="material-symbols-outlined text-[20px]">{faves.has(p.id) ? 'favorite' : 'favorite_border'}</span>
         </button>
