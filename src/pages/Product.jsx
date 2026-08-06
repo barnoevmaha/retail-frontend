@@ -34,6 +34,8 @@ export default function Product() {
     || product.variants.find((v) => colorOf(v) === color)
     || product.variants.find((v) => v.size === size)
     || product.variants[0]
+  const productImg = product.images?.find((i) => variant?.color_id && i.color_id === variant.color_id)?.image_url
+    || product.images?.[0]?.image_url
 
   const selectColor = (c) => {
     setColor(c)
@@ -70,8 +72,8 @@ export default function Product() {
         {/* Gallery */}
         <div className="lg:col-span-7">
           <div className="relative aspect-[3/4] w-full bg-surface-muted rounded-lg overflow-hidden group">
-            {variant?.image_url || product.images?.[0]?.image_url ? (
-              <img src={variant?.image_url || product.images?.[0]?.image_url} alt={product.name} className="w-full h-full object-cover product-image" />
+            {variant?.image_url || productImg ? (
+              <img src={variant?.image_url || productImg} alt={product.name} className="w-full h-full object-cover product-image" />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
                 <span className="font-display text-display-lg text-ink-muted/20 uppercase tracking-tighter">{product.name.charAt(0)}</span>

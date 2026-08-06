@@ -3,6 +3,60 @@ import { Link } from 'react-router-dom'
 import api from '../api/client'
 import { useI18n } from '../i18n'
 
+const ProductCard = ({ p, label }) => {
+  const { t } = useI18n()
+  const [hoverColorId, setHoverColorId] = useState(null)
+
+  const colors = [...new Map(p.variants.filter((v) => v.color_name || v.color).map((v) => [v.color_name || v.color, v])).values()]
+    .map((v) => ({ name: v.color_name || v.color, id: v.color_id, hex: v.color_hex }))
+  const img = p.images?.find((i) => hoverColorId && i.color_id === hoverColorId)?.image_url
+    || p.images?.[0]?.image_url
+    || p.image_url
+  const price = p.variants?.length
+    ? Math.min(...p.variants.map((v) => Number(v.selling_price) || 0))
+    : 0
+
+  return (
+    <Link to={`/products/${p.slug}`} className="group flex flex-col">
+      <div className="relative overflow-hidden rounded-lg aspect-[3/4] mb-6 bg-surface-muted">
+        {img ? (
+          <img src={img} alt={p.name} className="w-full h-full object-cover product-image" loading="lazy" />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            <span className="font-display text-headline-md text-ink-muted/30 uppercase tracking-tighter">{p.name.charAt(0)}</span>
+          </div>
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-bg/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        {(price > 0 || colors.length > 0) && (
+          <div className="absolute inset-x-0 bottom-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300 bg-bg/95 backdrop-blur-sm px-5 py-4 flex items-center justify-between gap-4">
+            <span className="text-body-md text-ink font-medium whitespace-nowrap">{price ? `$${price}` : ''}</span>
+            {colors.length > 0 && (
+              <div className="flex items-center gap-2.5">
+                {colors.map((c) => (
+                  <button
+                    key={c.name}
+                    onClick={(e) => e.preventDefault()}
+                    onMouseEnter={() => setHoverColorId(c.id)}
+                    onMouseLeave={() => setHoverColorId(null)}
+                    title={c.name}
+                    className={`w-6 h-6 rounded-full border border-black/15 transition-transform ${hoverColorId === c.id ? 'scale-110 border-ink' : ''}`}
+                    style={{ background: c.hex || 'linear-gradient(135deg,#e5e5e5 50%,#d4d4d4 50%)' }}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+      <div className="flex flex-col gap-1">
+        <span className="eyebrow text-ink-muted">{label}</span>
+        <h3 className="font-display text-body-lg text-ink font-medium truncate">{p.name}</h3>
+        <span className="text-body-md text-ink-muted">{price ? `$${price}` : ''}</span>
+      </div>
+    </Link>
+  )
+}
+
 export default function Catalog() {
   const { t } = useI18n()
   const [products, setProducts] = useState([])
@@ -18,6 +72,10 @@ export default function Catalog() {
     api.get('/products/').then((r) => setProducts(r.data.items || [])).catch(() => {})
     api.get('/categories/').then((r) => setCategories(r.data || [])).catch(() => {})
   }, [])
+
+  const prodCatLabel = (p) => p.category_slug
+    ? (t(`category.${p.category_slug}`) === `category.${p.category_slug}` ? p.category_name : t(`category.${p.category_slug}`))
+    : (p.category_name || t("Catalog"))
 
   const filtered = selectedCat ? products.filter((p) => p.category_id === parseInt(selectedCat)) : products
 
@@ -52,31 +110,9 @@ export default function Catalog() {
 
       {/* Product grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-x-gutter gap-y-16">
-        {filtered.map((p) => {
-          const img = p.images?.[0]?.image_url || p.image_url
-          const price = p.variants?.length
-            ? Math.min(...p.variants.map((v) => Number(v.selling_price) || 0))
-            : 0
-          return (
-            <Link key={p.id} to={`/products/${p.slug}`} className="group flex flex-col">
-              <div className="relative overflow-hidden rounded-lg aspect-[3/4] mb-6 bg-surface-muted">
-                {img ? (
-                  <img src={img} alt={p.name} className="w-full h-full object-cover product-image" loading="lazy" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <span className="font-display text-headline-md text-ink-muted/30 uppercase tracking-tighter">{p.name.charAt(0)}</span>
-                  </div>
-                )}
-                <div className="absolute inset-0 bg-gradient-to-t from-bg/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              </div>
-              <div className="flex flex-col gap-1">
-                <span className="eyebrow text-ink-muted">{p.category_slug ? (t(`category.${p.category_slug}`) === `category.${p.category_slug}` ? p.category_name : t(`category.${p.category_slug}`)) : (p.category_name || t("Catalog"))}</span>
-                <h3 className="font-display text-body-lg text-ink font-medium truncate">{p.name}</h3>
-                <span className="text-body-md text-ink-muted">{price ? `$${price}` : ''}</span>
-              </div>
-            </Link>
-          )
-        })}
+        {filtered.map((p) => (
+          <ProductCard key={p.id} p={p} label={prodCatLabel(p)} />
+        ))}
       </div>
 
       {filtered.length === 0 && (
