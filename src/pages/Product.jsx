@@ -11,6 +11,7 @@ export default function Product() {
   const [product, setProduct] = useState(null)
   const [color, setColor] = useState(null)
   const [size, setSize] = useState(null)
+  const [hoverColor, setHoverColor] = useState(null)
   const { addToCart } = useCart()
   const toast = useToast()
 
@@ -101,25 +102,31 @@ export default function Product() {
             {colors.length > 0 && (
               <div className="flex flex-col gap-4">
                 <span className="eyebrow text-ink">{t("Color")}</span>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-3">
                   {colors.map((c) => {
                     const hex = product.variants.find((v) => colorOf(v) === c)?.color_hex
+                    const active = color === c
                     return (
-                      <button
-                        key={c}
-                        onClick={() => selectColor(c)}
-                        className={`flex items-center gap-2.5 px-3.5 py-3 border text-body-md transition-colors ${
-                          color === c
-                            ? 'border-ink bg-ink text-bg'
-                            : 'border-border/60 text-ink hover:border-ink/60'
-                        }`}
-                      >
-                        <span
-                          className="w-4 h-4 rounded-full border border-black/15 flex-shrink-0"
+                      <div key={c} className="relative">
+                        <button
+                          type="button"
+                          onClick={() => selectColor(c)}
+                          onMouseEnter={() => setHoverColor(c)}
+                          onMouseLeave={() => setHoverColor(null)}
+                          aria-label={c}
+                          className={`w-8 h-8 rounded-full border transition-all duration-200 ${
+                            active
+                              ? 'border-ink ring-2 ring-inset ring-ink scale-110'
+                              : 'border-black/15 hover:scale-110'
+                          }`}
                           style={{ background: hex || 'linear-gradient(135deg,#e5e5e5 50%,#d4d4d4 50%)' }}
                         />
-                        {c}
-                      </button>
+                        {hoverColor === c && (
+                          <span className="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap px-2.5 py-1 text-[11px] uppercase tracking-widest bg-ink text-bg rounded pointer-events-none">
+                            {c}
+                          </span>
+                        )}
+                      </div>
                     )
                   })}
                 </div>
@@ -130,21 +137,16 @@ export default function Product() {
             {product.variants?.length > 0 && (
               <div className="flex flex-col gap-4">
                 <span className="eyebrow text-ink">{t("Select Size")}</span>
-                <div className="grid grid-cols-4 sm:grid-cols-5 gap-2">
-                  {product.variants.map((v) => (
-                    <button
-                      key={v.id}
-                      onClick={() => selectSize(v.size)}
-                      className={`py-3 border text-body-md transition-colors ${
-                        size === v.size
-                          ? 'border-ink bg-ink text-bg'
-                          : 'border-border/60 text-ink hover:border-ink/60'
-                      }`}
-                    >
-                      {v.size}
-                    </button>
+                <select
+                  value={size || ''}
+                  onChange={(e) => selectSize(e.target.value)}
+                  className="w-full py-3.5 px-4 border border-border/60 bg-transparent text-body-md text-ink cursor-pointer focus:border-ink focus:outline-none"
+                >
+                  <option value="" disabled>{t("Select Size")}</option>
+                  {[...new Set(product.variants.map((v) => v.size))].map((s) => (
+                    <option key={s} value={s}>{s}</option>
                   ))}
-                </div>
+                </select>
               </div>
             )}
 
