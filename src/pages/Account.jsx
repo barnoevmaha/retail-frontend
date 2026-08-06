@@ -79,7 +79,7 @@ export default function Account() {
   useEffect(() => {
     if (tab !== 'orders' || !customer) return
     setOrdersLoading(true)
-    api.get('/customer/orders').then((r) => setOrders(r.data || [])).catch(() => {}).finally(() => setOrdersLoading(false))
+    api.get('/customer/orders/').then((r) => setOrders(r.data || [])).catch(() => {}).finally(() => setOrdersLoading(false))
   }, [tab, customer])
 
   return (
