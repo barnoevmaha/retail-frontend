@@ -63,7 +63,7 @@ export default function Favorites() {
                   aria-label={t("Remove from favorites")}
                   className="absolute top-3 right-3 w-10 h-10 rounded-full bg-bg/85 backdrop-blur-sm flex items-center justify-center text-ink border border-border/10 hover:border-ink transition-colors"
                 >
-                  <span className="material-symbols-outlined text-[20px]">favorite</span>
+                  <span className="material-symbols-outlined filled text-[20px]">favorite</span>
                 </button>
               </Link>
               <Link to={`/products/${f.product_slug}`} className="hover:opacity-70 transition-opacity">

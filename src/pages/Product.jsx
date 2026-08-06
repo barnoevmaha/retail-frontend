@@ -111,7 +111,7 @@ export default function Product() {
               aria-label={t("Toggle favorite")}
               className={`absolute top-4 right-4 w-11 h-11 rounded-full bg-bg/85 backdrop-blur-sm flex items-center justify-center border border-border/10 transition-colors ${faves.has(product.id) ? 'text-danger' : 'text-ink hover:border-ink'}`}
             >
-              <span className="material-symbols-outlined text-[22px]">{faves.has(product.id) ? 'favorite' : 'favorite_border'}</span>
+              <span className={`material-symbols-outlined text-[22px] ${faves.has(product.id) ? 'filled' : ''}`}>{faves.has(product.id) ? 'favorite' : 'favorite_border'}</span>
             </button>
           </div>
         </div>

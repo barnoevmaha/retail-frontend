@@ -47,7 +47,7 @@ const ProductCard = ({ p, label }) => {
           aria-label={t("Toggle favorite")}
           className={`absolute top-3 right-3 w-10 h-10 rounded-full bg-bg/85 backdrop-blur-sm flex items-center justify-center border border-border/10 transition-colors ${faves.has(p.id) ? 'text-danger' : 'text-ink hover:border-ink'}`}
         >
-          <span className="material-symbols-outlined text-[20px]">{faves.has(p.id) ? 'favorite' : 'favorite_border'}</span>
+          <span className={`material-symbols-outlined text-[20px] ${faves.has(p.id) ? 'filled' : ''}`}>{faves.has(p.id) ? 'favorite' : 'favorite_border'}</span>
         </button>
         {(price > 0 || colors.length > 0) && (
           <div className="absolute inset-x-0 bottom-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300 bg-bg/95 backdrop-blur-sm px-5 py-4 flex items-center justify-between gap-4">
