@@ -1,5 +1,6 @@
 import { Routes, Route, Link } from 'react-router-dom'
 import { CartProvider } from './context/CartContext'
+import { FavoritesProvider } from './context/FavoritesContext'
 import { AuthProvider } from './context/AuthContext'
 import { ThemeProvider } from './context/ThemeContext'
 import { ToastProvider } from './context/ToastContext'
@@ -9,6 +10,8 @@ import Home from './pages/Home'
 import Catalog from './pages/Catalog'
 import Product from './pages/Product'
 import Cart from './pages/Cart'
+import Checkout from './pages/Checkout'
+import Favorites from './pages/Favorites'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import ForgotPassword from './pages/ForgotPassword'
@@ -52,8 +55,9 @@ export default function App() {
     <I18nProvider>
       <AuthProvider>
         <CartProvider>
-          <ThemeProvider>
-            <ToastProvider>
+          <FavoritesProvider>
+            <ThemeProvider>
+              <ToastProvider>
               <div className="min-h-screen bg-bg transition-colors flex flex-col">
                 <Header />
                 <main className="flex-1 w-full max-w-container-max mx-auto px-mobile-margin md:px-section-padding-h pt-28 md:pt-32 pb-section-padding-v">
@@ -62,6 +66,8 @@ export default function App() {
                     <Route path="catalog" element={<Catalog />} />
                     <Route path="products/:slug" element={<Product />} />
                     <Route path="cart" element={<Cart />} />
+                    <Route path="checkout" element={<Checkout />} />
+                    <Route path="favorites" element={<Favorites />} />
                     <Route path="login" element={<Login />} />
                     <Route path="register" element={<Register />} />
                     <Route path="forgot-password" element={<ForgotPassword />} />
@@ -73,6 +79,7 @@ export default function App() {
               </div>
             </ToastProvider>
           </ThemeProvider>
+          </FavoritesProvider>
         </CartProvider>
       </AuthProvider>
     </I18nProvider>

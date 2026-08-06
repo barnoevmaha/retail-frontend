@@ -2,38 +2,66 @@ import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import api from '../api/client'
 import { useCart } from '../context/CartContext'
-import { useAuth } from '../context/AuthContext'
+import { useToast } from '../context/ToastContext'
 import { useI18n } from '../i18n'
+
+function sessionKey() {
+  let key = sessionStorage.getItem('session_key')
+  if (!key) {
+    key = 'guest_' + Math.random().toString(36).slice(2)
+    sessionStorage.setItem('session_key', key)
+  }
+  return key
+}
 
 export default function Cart() {
   const { t } = useI18n()
   const navigate = useNavigate()
-  const { customer } = useAuth()
+  const toast = useToast()
   const [items, setItems] = useState([])
   const [total, setTotal] = useState(0)
+  const [qtyLoading, setQtyLoading] = useState(null)
+  const [checkoutLoading, setCheckoutLoading] = useState(false)
   const { refresh } = useCart()
 
-  useEffect(() => {
-    const key = sessionStorage.getItem('session_key') || 'guest_' + Math.random().toString(36).slice(2)
-    if (!sessionStorage.getItem('session_key')) sessionStorage.setItem('session_key', key)
-    api.get('/cart/', { headers: { 'X-Session-Key': key } }).then((r) => {
+  const load = () => {
+    api.get('/cart/', { headers: { 'X-Session-Key': sessionKey() } })
+      .then((r) => { setItems(r.data.items || []); setTotal(r.data.total || 0) })
+      .catch(() => {})
+  }
+  useEffect(() => { load() }, [])
+
+  const changeQty = async (item, qty) => {
+    if (qty < 1 || qty === item.quantity || qtyLoading) return
+    setQtyLoading(item.id)
+    try {
+      const r = await api.put(`/cart/items/${item.id}`, { quantity: qty }, { headers: { 'X-Session-Key': sessionKey() } })
       setItems(r.data.items || [])
       setTotal(r.data.total || 0)
-    }).catch(() => {})
-  }, [])
+      refresh()
+    } catch (err) {
+      toast?.addToast(err.response?.data?.detail || t("Could not update quantity"), 'error')
+    } finally {
+      setQtyLoading(null)
+    }
+  }
 
-  const remove = async (itemId) => {
-    const key = sessionStorage.getItem('session_key')
+  const removeItem = async (itemId) => {
     try {
-      await api.delete(`/cart/items/${itemId}`, { headers: { 'X-Session-Key': key } })
+      await api.delete(`/cart/items/${itemId}`, { headers: { 'X-Session-Key': sessionKey() } })
       setItems(items.filter((i) => i.id !== itemId))
       refresh()
     } catch {}
   }
 
+  const goCheckout = () => {
+    if (checkoutLoading) return
+    setCheckoutLoading(true)
+    navigate('/checkout')
+  }
+
   return (
     <div>
-      {/* Page header */}
       <div className="mb-12 border-b border-border/10 pb-6 flex justify-between items-end">
         <div>
           <h1 className="font-display text-headline-lg text-ink">{t("Shopping Bag")}</h1>
@@ -53,31 +81,71 @@ export default function Cart() {
         </div>
       ) : (
         <div className="flex flex-col lg:flex-row gap-16 lg:gap-24">
-          {/* Items list */}
           <div className="flex-1 flex flex-col gap-10">
             {items.map((item) => (
-              <article key={item.id} className="flex gap-6 md:gap-8 group">
-                <div className="w-28 h-36 md:w-44 md:h-56 bg-surface-muted rounded-lg overflow-hidden flex-shrink-0 relative">
+              <article key={item.id} className="flex gap-6 md:gap-8">
+                <Link to={`/products/${item.product_slug}`} className="w-28 h-36 md:w-44 md:h-56 bg-surface-muted rounded-lg overflow-hidden flex-shrink-0 group">
                   {item.image_url ? (
-                    <img src={item.image_url} alt={item.product_name} className="w-full h-full object-cover" />
+                    <img src={item.image_url} alt={item.product_name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
                       <span className="font-display text-headline-lg text-ink-muted/25 uppercase">{item.product_name.charAt(0)}</span>
                     </div>
                   )}
-                </div>
+                </Link>
                 <div className="flex flex-col justify-between py-2 flex-grow">
                   <div>
-                    <p className="eyebrow text-ink-muted mb-2">{t("Catalog")}</p>
-                    <h3 className="font-display text-body-lg text-ink">{item.product_name}</h3>
-                    <p className="text-body-md text-ink-muted mt-1">
-                      {t("Qty: {qty}").replace('{qty}', item.quantity)}
-                    </p>
+                    <Link to={`/products/${item.product_slug}`} className="hover:opacity-70 transition-opacity">
+                      <h3 className="font-display text-body-lg text-ink">{item.product_name}</h3>
+                    </Link>
+                    {(item.color || item.size) && (
+                      <div className="flex items-center gap-3 mt-2">
+                        {item.color && (
+                          <span className="flex items-center gap-2 text-body-sm text-ink-muted">
+                            <span
+                              className="w-3.5 h-3.5 rounded-full border border-black/15"
+                              style={{ background: item.color_hex || 'linear-gradient(135deg,#e5e5e5 50%,#d4d4d4 50%)' }}
+                            />
+                            {item.color}
+                          </span>
+                        )}
+                        {item.size && <span className="text-body-sm text-ink-muted">{t("Size")}: {item.size}</span>}
+                      </div>
+                    )}
+                    <div className="flex items-center gap-3 mt-4">
+                      <button
+                        type="button"
+                        onClick={() => changeQty(item, item.quantity - 1)}
+                        disabled={qtyLoading === item.id || item.quantity <= 1}
+                        className="w-8 h-8 border border-border/60 flex items-center justify-center text-ink hover:border-ink transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                        aria-label={t("Decrease")}
+                      >
+                        <span className="material-symbols-outlined text-[16px]">remove</span>
+                      </button>
+                      <span className="w-8 text-center text-body-md text-ink">
+                        {qtyLoading === item.id ? '…' : item.quantity}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => changeQty(item, item.quantity + 1)}
+                        disabled={qtyLoading === item.id || item.quantity >= item.stock}
+                        className="w-8 h-8 border border-border/60 flex items-center justify-center text-ink hover:border-ink transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                        aria-label={t("Increase")}
+                      >
+                        <span className="material-symbols-outlined text-[16px]">add</span>
+                      </button>
+                      {item.quantity >= item.stock && item.stock > 0 && (
+                        <span className="text-body-xs text-ink-muted">{t("Only {n} available").replace('{n}', item.stock)}</span>
+                      )}
+                    </div>
                   </div>
                   <div className="flex justify-between items-center border-b border-border/10 pb-4">
-                    <span className="font-display text-body-lg text-ink">${item.price}</span>
+                    <div className="flex flex-col gap-0.5">
+                      <span className="font-display text-body-lg text-ink">${(item.price * item.quantity).toFixed(2)}</span>
+                      <span className="text-body-sm text-ink-muted">${item.price} {t("each")}</span>
+                    </div>
                     <button
-                      onClick={() => remove(item.id)}
+                      onClick={() => removeItem(item.id)}
                       className="eyebrow text-ink-muted hover:text-danger transition-colors flex items-center gap-1"
                     >
                       <span className="material-symbols-outlined text-[16px]">close</span>
@@ -89,7 +157,6 @@ export default function Cart() {
             ))}
           </div>
 
-          {/* Order summary */}
           <aside className="w-full lg:w-[400px] flex-shrink-0">
             <div className="bg-surface-muted/70 border border-border/10 rounded-xl p-8 lg:sticky lg:top-32">
               <h2 className="font-display text-headline-md text-ink mb-8 pb-4 border-b border-border/10">
@@ -109,7 +176,11 @@ export default function Cart() {
                 <span className="font-display text-body-lg text-ink font-medium">{t("Total")}</span>
                 <span className="font-display text-headline-md text-ink">${total.toFixed(2)}</span>
               </div>
-              <button className="btn-primary w-full py-5" onClick={() => { if (!customer) navigate('/login') }}>
+              <button
+                className="btn-primary w-full py-5"
+                onClick={goCheckout}
+                disabled={checkoutLoading}
+              >
                 {t("Proceed to Secure Checkout")}
                 <span className="material-symbols-outlined text-[20px]">lock</span>
               </button>

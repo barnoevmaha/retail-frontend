@@ -1,11 +1,25 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import api from '../api/client'
+import { useAuth } from '../context/AuthContext'
+import { useFavorites } from '../context/FavoritesContext'
+import { useToast } from '../context/ToastContext'
 import { useI18n } from '../i18n'
 
 const ProductCard = ({ p, label }) => {
   const { t } = useI18n()
+  const navigate = useNavigate()
+  const toast = useToast()
+  const { customer } = useAuth()
+  const { faves, toggle: toggleFav } = useFavorites()
   const [hoverColorId, setHoverColorId] = useState(null)
+
+  const handleFav = async (e) => {
+    e.preventDefault()
+    if (!customer) { navigate('/login'); return }
+    const ok = await toggleFav(p.id)
+    toast?.addToast(ok ? (faves.has(p.id) ? t("Removed from favorites") : t("Added to favorites")) : t("Something went wrong"), ok ? 'success' : 'error')
+  }
 
   const colors = [...new Map(p.variants.filter((v) => v.color_name || v.color).map((v) => [v.color_name || v.color, v])).values()]
     .map((v) => ({ name: v.color_name || v.color, id: v.color_id, hex: v.color_hex }))
@@ -27,6 +41,14 @@ const ProductCard = ({ p, label }) => {
           </div>
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-bg/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        <button
+          type="button"
+          onClick={handleFav}
+          aria-label={t("Toggle favorite")}
+          className={`absolute top-3 right-3 w-10 h-10 rounded-full bg-bg/85 backdrop-blur-sm flex items-center justify-center border border-border/10 transition-colors ${faves.has(p.id) ? 'text-danger' : 'text-ink hover:border-ink'}`}
+        >
+          <span className="material-symbols-outlined text-[20px]">{faves.has(p.id) ? 'favorite' : 'favorite_border'}</span>
+        </button>
         {(price > 0 || colors.length > 0) && (
           <div className="absolute inset-x-0 bottom-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300 bg-bg/95 backdrop-blur-sm px-5 py-4 flex items-center justify-between gap-4">
             <span className="text-body-md text-ink font-medium whitespace-nowrap">{price ? `$${price}` : ''}</span>

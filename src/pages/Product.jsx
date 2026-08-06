@@ -1,14 +1,19 @@
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import api from '../api/client'
 import { useCart } from '../context/CartContext'
 import { useToast } from '../context/ToastContext'
+import { useAuth } from '../context/AuthContext'
+import { useFavorites } from '../context/FavoritesContext'
 import { useI18n } from '../i18n'
 
 export default function Product() {
   const { t } = useI18n()
+  const navigate = useNavigate()
   const { slug } = useParams()
+  const { customer } = useAuth()
+  const { faves, toggle: toggleFav } = useFavorites()
   const [product, setProduct] = useState(null)
   const [color, setColor] = useState(null)
   const [size, setSize] = useState(null)
@@ -68,6 +73,12 @@ export default function Product() {
     toast?.addToast(t("Added to cart"), 'success')
   }
 
+  const handleFav = async () => {
+    if (!customer) { navigate('/login'); return }
+    const ok = await toggleFav(product.id)
+    toast?.addToast(ok ? (faves.has(product.id) ? t("Removed from favorites") : t("Added to favorites")) : t("Something went wrong"), ok ? 'success' : 'error')
+  }
+
   return (
     <div>
       {/* Breadcrumbs */}
@@ -88,6 +99,14 @@ export default function Product() {
                 <span className="font-display text-display-lg text-ink-muted/20 uppercase tracking-tighter">{product.name.charAt(0)}</span>
               </div>
             )}
+            <button
+              type="button"
+              onClick={handleFav}
+              aria-label={t("Toggle favorite")}
+              className={`absolute top-4 right-4 w-11 h-11 rounded-full bg-bg/85 backdrop-blur-sm flex items-center justify-center border border-border/10 transition-colors ${faves.has(product.id) ? 'text-danger' : 'text-ink hover:border-ink'}`}
+            >
+              <span className="material-symbols-outlined text-[22px]">{faves.has(product.id) ? 'favorite' : 'favorite_border'}</span>
+            </button>
           </div>
         </div>
 

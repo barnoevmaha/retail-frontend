@@ -67,6 +67,10 @@ export default function Header() {
             <span className="material-symbols-outlined text-[20px]">{themeIcon}</span>
           </button>
 
+          <Link to="/favorites" className="text-ink-muted hover:text-ink transition-colors duration-500" aria-label="Favorites">
+            <span className="material-symbols-outlined text-[20px]">favorite_border</span>
+          </Link>
+
           <Link to="/cart" className="relative text-ink-muted hover:text-ink transition-colors duration-500" aria-label="Cart">
             <span className="material-symbols-outlined text-[20px]">shopping_bag</span>
             {count > 0 && (
