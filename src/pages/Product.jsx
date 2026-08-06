@@ -9,16 +9,46 @@ export default function Product() {
   const { t } = useI18n()
   const { slug } = useParams()
   const [product, setProduct] = useState(null)
-  const [variant, setVariant] = useState(null)
+  const [color, setColor] = useState(null)
+  const [size, setSize] = useState(null)
   const { addToCart } = useCart()
   const toast = useToast()
 
+  const colorOf = (v) => v && (v.color_name || v.color || null)
+
   useEffect(() => {
-    api.get(`/products/${slug}`).then((r) => { setProduct(r.data); setVariant(r.data.variants?.[0] || null) }).catch(() => {})
+    api.get(`/products/${slug}`).then((r) => {
+      setProduct(r.data)
+      const v = r.data.variants?.[0] || null
+      setColor(colorOf(v))
+      setSize(v?.size || null)
+    }).catch(() => {})
   }, [slug])
 
   if (!product) {
     return <div className="py-24 text-center text-body-md text-ink-muted">{t("Loading...")}</div>
+  }
+
+  const colors = [...new Set(product.variants.map(colorOf).filter(Boolean))]
+  const variant = product.variants.find((v) => colorOf(v) === color && v.size === size)
+    || product.variants.find((v) => colorOf(v) === color)
+    || product.variants.find((v) => v.size === size)
+    || product.variants[0]
+
+  const selectColor = (c) => {
+    setColor(c)
+    if (!product.variants.find((v) => colorOf(v) === c && v.size === size)) {
+      const firstOfColor = product.variants.find((v) => colorOf(v) === c)
+      if (firstOfColor) setSize(firstOfColor.size)
+    }
+  }
+
+  const selectSize = (s) => {
+    setSize(s)
+    if (!product.variants.find((v) => colorOf(v) === color && v.size === s)) {
+      const firstWithSize = product.variants.find((v) => v.size === s)
+      if (firstWithSize) setColor(colorOf(firstWithSize))
+    }
   }
 
   const handleAdd = async () => {
@@ -65,6 +95,35 @@ export default function Product() {
               {product.description || t("An exploration of enduring style. Precision tailoring meets modern sensibility.")}
             </p>
 
+            {/* Color selection */}
+            {colors.length > 0 && (
+              <div className="flex flex-col gap-4">
+                <span className="eyebrow text-ink">{t("Color")}</span>
+                <div className="flex flex-wrap gap-2">
+                  {colors.map((c) => {
+                    const hex = product.variants.find((v) => colorOf(v) === c)?.color_hex
+                    return (
+                      <button
+                        key={c}
+                        onClick={() => selectColor(c)}
+                        className={`flex items-center gap-2.5 px-3.5 py-3 border text-body-md transition-colors ${
+                          color === c
+                            ? 'border-ink bg-ink text-bg'
+                            : 'border-border/60 text-ink hover:border-ink/60'
+                        }`}
+                      >
+                        <span
+                          className="w-4 h-4 rounded-full border border-black/15 flex-shrink-0"
+                          style={{ background: hex || 'linear-gradient(135deg,#e5e5e5 50%,#d4d4d4 50%)' }}
+                        />
+                        {c}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+
             {/* Size / variant selection */}
             {product.variants?.length > 0 && (
               <div className="flex flex-col gap-4">
@@ -73,9 +132,9 @@ export default function Product() {
                   {product.variants.map((v) => (
                     <button
                       key={v.id}
-                      onClick={() => setVariant(v)}
+                      onClick={() => selectSize(v.size)}
                       className={`py-3 border text-body-md transition-colors ${
-                        variant?.id === v.id
+                        size === v.size
                           ? 'border-ink bg-ink text-bg'
                           : 'border-border/60 text-ink hover:border-ink/60'
                       }`}
@@ -84,7 +143,6 @@ export default function Product() {
                     </button>
                   ))}
                 </div>
-                <p className="eyebrow text-ink-muted">{t("Color: {value}").replace('{value}', variant?.color || '—')}</p>
               </div>
             )}
 
