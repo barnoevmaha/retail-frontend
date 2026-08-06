@@ -13,6 +13,12 @@ export default function Product() {
   const [size, setSize] = useState(null)
   const [hoverColor, setHoverColor] = useState(null)
   const [sizeOpen, setSizeOpen] = useState(false)
+  const [closing, setClosing] = useState(false)
+
+  const closeDrawer = () => {
+    setClosing(true)
+    setTimeout(() => { setSizeOpen(false); setClosing(false) }, 260)
+  }
   const { addToCart } = useCart()
   const toast = useToast()
 
@@ -152,33 +158,49 @@ export default function Product() {
             {/* Size drawer */}
             {sizeOpen && (
               <div className="fixed inset-0 z-50">
-                <div className="absolute inset-0 bg-ink/30" onClick={() => setSizeOpen(false)} />
-                <div className="absolute top-0 right-0 h-full w-[340px] max-w-[85vw] bg-bg flex flex-col">
-                  <div className="flex items-center justify-between px-6 py-5 border-b border-border/10">
-                    <span className="eyebrow text-ink">{t("Select Size")}</span>
-                    <button type="button" onClick={() => setSizeOpen(false)} className="text-ink-muted hover:text-ink transition-colors">
-                      <span className="material-symbols-outlined text-[20px]">close</span>
+                <div className={`absolute inset-0 bg-ink/25 ${closing ? 'opacity-0 transition-opacity duration-200' : 'drawer-fade'}`} onClick={closeDrawer} />
+                <div className={`absolute top-0 right-0 h-full w-[400px] max-w-[92vw] bg-bg shadow-2xl flex flex-col ${closing ? 'drawer-out' : 'drawer-in'}`}>
+                  <div className="flex items-start justify-between gap-4 px-6 md:px-8 pt-8 pb-6">
+                    <div>
+                      <h2 className="font-display text-headline-lg md:text-headline-xl text-ink tracking-tight">{t("Choose your size")}</h2>
+                      <p className="eyebrow text-ink-muted mt-2">
+                        {product.variants.filter((v) => colorOf(v) === color && v.quantity > 0).length} {t("sizes available")}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={closeDrawer}
+                      aria-label={t("Close")}
+                      className="w-11 h-11 rounded-full border border-border/60 flex items-center justify-center text-ink-muted hover:text-ink hover:border-ink transition-colors flex-shrink-0"
+                    >
+                      <span className="material-symbols-outlined text-[18px]">close</span>
                     </button>
                   </div>
-                  <div className="flex-1 overflow-y-auto px-6 py-4">
-                    {[...new Set(product.variants.map((v) => v.size))].map((s) => {
-                      const v = product.variants.find((x) => colorOf(x) === color && x.size === s)
-                      const available = !!v && v.quantity > 0
-                      return (
-                        <button
-                          key={s}
-                          type="button"
-                          disabled={!available}
-                          onClick={() => { selectSize(s); setSizeOpen(false) }}
-                          className={`w-full flex items-center justify-between py-3.5 border-b border-border/10 text-body-md text-left transition-colors ${
-                            available ? 'text-ink hover:text-ink-muted' : 'text-ink-muted/40 line-through cursor-not-allowed'
-                          }`}
-                        >
-                          {s}
-                          {size === s && available && <span className="material-symbols-outlined text-[16px] text-ink">check</span>}
-                        </button>
-                      )
-                    })}
+                  <div className="mx-6 md:mx-8 border-t border-border/10" />
+                  <div className="flex-1 overflow-y-auto px-6 md:px-8 py-6">
+                    <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5">
+                      {[...new Set(product.variants.map((v) => v.size))].map((s) => {
+                        const v = product.variants.find((x) => colorOf(x) === color && x.size === s)
+                        const available = !!v && v.quantity > 0
+                        return (
+                          <button
+                            key={s}
+                            type="button"
+                            disabled={!available}
+                            onClick={() => { selectSize(s); closeDrawer() }}
+                            className={`py-4 border text-body-md font-medium transition-colors duration-200 ${
+                              size === s && available
+                                ? 'bg-ink text-bg border-ink'
+                                : available
+                                  ? 'border-border/60 text-ink hover:border-ink'
+                                  : 'border-border/20 text-ink-muted/40 line-through cursor-not-allowed'
+                            }`}
+                          >
+                            {s}
+                          </button>
+                        )
+                      })}
+                    </div>
                   </div>
                 </div>
               </div>

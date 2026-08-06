@@ -281,6 +281,22 @@ h1, h2, h3 {
   animation: slide-up 0.3s ease-out;
 }
 
+@keyframes drawer-in {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+@keyframes drawer-out {
+  from { transform: translateX(0); }
+  to { transform: translateX(100%); }
+}
+@keyframes drawer-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.drawer-in { animation: drawer-in 0.3s cubic-bezier(0.22, 1, 0.36, 1); }
+.drawer-out { animation: drawer-out 0.26s ease-in forwards; }
+.drawer-fade { animation: drawer-fade 0.25s ease-out; }
+
 @media (prefers-reduced-motion: reduce) {
   .reveal-up, .animate-slide-up { animation: none; opacity: 1; transform: none; }
   .product-image, .hover-lift { transition: none; }
