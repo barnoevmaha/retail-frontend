@@ -13,8 +13,9 @@ export function AuthProvider({ children }) {
       api.get('/customer/account/me')
         .then((r) => setCustomer(r.data))
         .catch(() => {
-          localStorage.removeItem('customer_token')
-          localStorage.removeItem('token')
+          if (!localStorage.getItem('customer_refresh_token')) {
+            localStorage.removeItem('customer_token')
+          }
         })
         .finally(() => setLoading(false))
     } else {
@@ -22,13 +23,15 @@ export function AuthProvider({ children }) {
     }
   }, [])
 
-  const login = (token, customerData) => {
+  const login = (token, customerData, refreshToken) => {
     localStorage.setItem('customer_token', token)
+    if (refreshToken) localStorage.setItem('customer_refresh_token', refreshToken)
     setCustomer(customerData)
   }
 
   const logout = () => {
     localStorage.removeItem('customer_token')
+    localStorage.removeItem('customer_refresh_token')
     localStorage.removeItem('token')
     setCustomer(null)
   }

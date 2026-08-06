@@ -9,7 +9,7 @@ const inputCls = 'input-line'
 
 export default function Account() {
   const { t } = useI18n()
-  const { customer, logout } = useAuth()
+  const { customer, loading, logout } = useAuth()
   const toast = useToast()
   const navigate = useNavigate()
   const location = useLocation()
@@ -23,6 +23,7 @@ export default function Account() {
   const [error, setError] = useState('')
 
   useEffect(() => {
+    if (loading) return
     if (!customer) { navigate('/login'); return }
     setProfile({
       first_name: customer.first_name || '',
@@ -34,7 +35,7 @@ export default function Account() {
       timezone: customer.timezone || 'UTC',
     })
     api.get('/customer/account/addresses').then((r) => setAddresses(r.data)).catch(() => { })
-  }, [customer, navigate])
+  }, [customer, loading, navigate])
 
   const saveProfile = async (e) => {
     e.preventDefault()

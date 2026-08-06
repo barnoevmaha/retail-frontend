@@ -22,7 +22,7 @@ export default function Login() {
     setLoading(true)
     try {
       const res = await api.post('/customer/auth/login', { login, password })
-      authLogin(res.data.access_token, res.data.customer)
+      authLogin(res.data.access_token, res.data.customer, res.data.refresh_token)
       toast?.addToast('Welcome back!', 'success')
       navigate('/')
     } catch (err) {

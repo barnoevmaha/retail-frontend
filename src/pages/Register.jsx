@@ -100,7 +100,7 @@ export default function Register() {
           password: password.pwd, confirm_password: password.confirm,
         })
       }
-      login(res.data.access_token, res.data.customer)
+      login(res.data.access_token, res.data.customer, res.data.refresh_token)
       toast?.addToast(t("Your account has been verified successfully."), 'success')
       navigate('/account', { state: { justRegistered: true } })
     } catch (err) {
