@@ -12,6 +12,7 @@ export default function Product() {
   const [color, setColor] = useState(null)
   const [size, setSize] = useState(null)
   const [hoverColor, setHoverColor] = useState(null)
+  const [sizeOpen, setSizeOpen] = useState(false)
   const { addToCart } = useCart()
   const toast = useToast()
 
@@ -137,16 +138,49 @@ export default function Product() {
             {product.variants?.length > 0 && (
               <div className="flex flex-col gap-4">
                 <span className="eyebrow text-ink">{t("Select Size")}</span>
-                <select
-                  value={size || ''}
-                  onChange={(e) => selectSize(e.target.value)}
-                  className="w-full py-3.5 px-4 border border-border/60 bg-transparent text-body-md text-ink cursor-pointer focus:border-ink focus:outline-none"
+                <button
+                  type="button"
+                  onClick={() => setSizeOpen(true)}
+                  className="w-full flex items-center justify-between py-3.5 px-4 border border-border/60 bg-transparent text-body-md cursor-pointer hover:border-ink/60 transition-colors"
                 >
-                  <option value="" disabled>{t("Select Size")}</option>
-                  {[...new Set(product.variants.map((v) => v.size))].map((s) => (
-                    <option key={s} value={s}>{s}</option>
-                  ))}
-                </select>
+                  <span className={size ? 'text-ink' : 'text-ink-muted'}>{size || t("Select Size")}</span>
+                  <span className="material-symbols-outlined text-[18px] text-ink-muted">expand_more</span>
+                </button>
+              </div>
+            )}
+
+            {/* Size drawer */}
+            {sizeOpen && (
+              <div className="fixed inset-0 z-50">
+                <div className="absolute inset-0 bg-ink/30" onClick={() => setSizeOpen(false)} />
+                <div className="absolute top-0 right-0 h-full w-[340px] max-w-[85vw] bg-bg flex flex-col">
+                  <div className="flex items-center justify-between px-6 py-5 border-b border-border/10">
+                    <span className="eyebrow text-ink">{t("Select Size")}</span>
+                    <button type="button" onClick={() => setSizeOpen(false)} className="text-ink-muted hover:text-ink transition-colors">
+                      <span className="material-symbols-outlined text-[20px]">close</span>
+                    </button>
+                  </div>
+                  <div className="flex-1 overflow-y-auto px-6 py-4">
+                    {[...new Set(product.variants.map((v) => v.size))].map((s) => {
+                      const v = product.variants.find((x) => colorOf(x) === color && x.size === s)
+                      const available = !!v && v.quantity > 0
+                      return (
+                        <button
+                          key={s}
+                          type="button"
+                          disabled={!available}
+                          onClick={() => { selectSize(s); setSizeOpen(false) }}
+                          className={`w-full flex items-center justify-between py-3.5 border-b border-border/10 text-body-md text-left transition-colors ${
+                            available ? 'text-ink hover:text-ink-muted' : 'text-ink-muted/40 line-through cursor-not-allowed'
+                          }`}
+                        >
+                          {s}
+                          {size === s && available && <span className="material-symbols-outlined text-[16px] text-ink">check</span>}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
               </div>
             )}
 
