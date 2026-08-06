@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { useParams, Link } from 'react-router-dom'
 import api from '../api/client'
 import { useCart } from '../context/CartContext'
@@ -147,17 +148,17 @@ export default function Product() {
                 <button
                   type="button"
                   onClick={() => setSizeOpen(true)}
-                  className="w-full flex items-center justify-between py-3.5 px-4 border border-border/60 bg-transparent text-body-md cursor-pointer hover:border-ink/60 transition-colors"
+                  className="w-full flex items-center justify-between py-4 border-y border-border/10 text-body-md cursor-pointer hover:text-ink-muted transition-colors"
                 >
-                  <span className={size ? 'text-ink' : 'text-ink-muted'}>{size || t("Select Size")}</span>
-                  <span className="material-symbols-outlined text-[18px] text-ink-muted">expand_more</span>
+                  <span className={size ? 'text-ink font-medium' : 'text-ink-muted'}>{size || t("Select Size")}</span>
+                  <span className="material-symbols-outlined text-[18px] text-ink-muted">chevron_right</span>
                 </button>
               </div>
             )}
 
-            {/* Size drawer */}
-            {sizeOpen && (
-              <div className="fixed inset-0 z-50">
+            {/* Size drawer — portal to body so it always sits above the header */}
+            {sizeOpen && createPortal(
+              <div className="fixed inset-0 z-[100]">
                 <div className={`absolute inset-0 bg-ink/25 ${closing ? 'opacity-0 transition-opacity duration-200' : 'drawer-fade'}`} onClick={closeDrawer} />
                 <div className={`absolute top-0 right-0 h-full w-[400px] max-w-[92vw] bg-bg shadow-2xl flex flex-col ${closing ? 'drawer-out' : 'drawer-in'}`}>
                   <div className="flex items-start justify-between gap-4 px-6 md:px-8 pt-8 pb-6">
@@ -203,7 +204,8 @@ export default function Product() {
                     </div>
                   </div>
                 </div>
-              </div>
+              </div>,
+              document.body
             )}
 
             {/* Actions */}
