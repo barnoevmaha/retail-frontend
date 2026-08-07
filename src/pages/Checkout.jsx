@@ -31,6 +31,9 @@ export default function Checkout() {
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
   const [placing, setPlacing] = useState(false)
+  const [promoCode, setPromoCode] = useState('')
+  const [appliedPromo, setAppliedPromo] = useState(null)
+  const [promoError, setPromoError] = useState('')
   const [form, setForm] = useState({ full_name: '', phone: '', city: '', address: '', apartment: '', delivery_note: '', save_address: false, latitude: null, longitude: null })
   const [errors, setErrors] = useState({})
   const [showMap, setShowMap] = useState(false)
@@ -48,6 +51,36 @@ export default function Checkout() {
   }, [])
 
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value })
+
+  const applyPromo = async () => {
+    const code = promoCode.trim()
+    if (!code) return
+    const base = subtotal + deliveryFee
+    try {
+      const res = await api.post('/promotions/validate', { code, order_total: base })
+      api.get('/cart/', { headers: { 'X-Session-Key': sessionKey() } })
+        .then((r) => {
+          setSubtotal(r.data.subtotal ?? r.data.total ?? 0)
+          setDeliveryFee(r.data.delivery_fee ?? 0)
+        })
+        .catch(() => {})
+      setAppliedPromo(res.data)
+      setTotal(round2(Math.max(base - res.data.discount, 0)))
+      setPromoError('')
+    } catch (err) {
+      setPromoError(err.response?.data?.detail || t('Invalid promo code'))
+      setAppliedPromo(null)
+      setTotal(subtotal + deliveryFee)
+    }
+  }
+
+  const removePromo = () => {
+    setAppliedPromo(null)
+    setPromoError('')
+    setTotal(subtotal + deliveryFee)
+  }
+
+  const round2 = (n) => Math.round(n * 100) / 100
 
   const validate = () => {
     const e = {}
@@ -69,6 +102,7 @@ export default function Checkout() {
       const res = await api.post('/checkout/', {
         payment_method: 'card',
         session_key: sessionKey(),
+        promo_code: appliedPromo ? appliedPromo.code : null,
         full_name: form.full_name.trim(),
         phone: form.phone.trim(),
         city: form.city.trim(),
@@ -216,9 +250,30 @@ export default function Checkout() {
               ))}
             </div>
             <div className="flex flex-col gap-3 text-body-md text-ink border-t border-border/10 pt-6 pb-6 mb-6 border-b">
+              {!appliedPromo ? (
+                <div className="flex gap-2">
+                  <input
+                    className="input flex-1"
+                    placeholder={t('Promo code')}
+                    value={promoCode}
+                    onChange={(e) => setPromoCode(e.target.value)}
+                  />
+                  <button className="btn-secondary" onClick={applyPromo}>{t('Apply')}</button>
+                </div>
+              ) : (
+                <div className="flex justify-between items-center">
+                  <span className="text-ink">{t('Promo applied')}: <strong>{appliedPromo.code}</strong></span>
+                  <button className="text-body-sm text-link underline" onClick={removePromo}>{t('Remove')}</button>
+                </div>
+              )}
+              {promoError && <p className={errCls}>{promoError}</p>}
               <div className="flex justify-between">
                 <span className="text-ink-muted">{t('Subtotal')}</span>
                 <span>${subtotal.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-ink-muted">{t('Discount')}</span>
+                <span>{appliedPromo ? `-$${appliedPromo.discount.toFixed(2)}` : '$0.00'}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-ink-muted">{t('Delivery')}</span>

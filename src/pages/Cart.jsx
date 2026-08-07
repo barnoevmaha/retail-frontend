@@ -138,6 +138,10 @@ export default function Cart() {
                   <span>${subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
+                  <span className="text-ink-muted">{t("Discount")}</span>
+                  <span>$0.00</span>
+                </div>
+                <div className="flex justify-between">
                   <span className="text-ink-muted">{t("Delivery")}</span>
                   <span>{deliveryFee === 0 ? t("Complimentary") : `$${deliveryFee.toFixed(2)}`}</span>
                 </div>
