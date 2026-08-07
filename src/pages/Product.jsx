@@ -13,6 +13,8 @@ export default function Product() {
   const { t } = useI18n()
   const { addToCart, items } = useCart()
   const { customer } = useAuth()
+  const navigate = useNavigate()
+  const { faves, toggle: toggleFav } = useFavorites()
   const toast = useToast()
   const [product, setProduct] = useState(null)
   const [color, setColor] = useState(null)
