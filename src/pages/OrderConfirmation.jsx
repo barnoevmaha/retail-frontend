@@ -1,14 +1,68 @@
-import { Link, useLocation, useNavigate, Navigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
+import api from '../api/client'
+import { useAuth } from '../context/AuthContext'
 import { useI18n } from '../i18n'
 import { orderStatus } from '../utils/orders'
 
+const cacheKey = (id) => `order_conf_${id}`
+
 export default function OrderConfirmation() {
   const { t } = useI18n()
-  const location = useLocation()
   const navigate = useNavigate()
-  const order = location.state?.order
+  const { id } = useParams()
+  const { customer, loading } = useAuth()
+  const location = useLocation()
+  const stateOrder = location.state?.order
+  const [order, setOrder] = useState(null)
+  const [notFound, setNotFound] = useState(false)
 
-  if (!order) return <Navigate to="/" replace />
+  useEffect(() => {
+    if (loading) return
+    const orderId = Number(id)
+    if (!orderId) { setNotFound(true); return }
+
+    let cached = null
+    if (stateOrder && Number(stateOrder.id) === orderId) {
+      cached = stateOrder
+      sessionStorage.setItem(cacheKey(orderId), JSON.stringify(stateOrder))
+    }
+
+    if (customer) {
+      // /customer/orders/:id enforces ownership (404 for another customer's order).
+      api.get(`/customer/orders/${orderId}`)
+        .then((r) => { setOrder(r.data); sessionStorage.setItem(cacheKey(orderId), JSON.stringify(r.data)) })
+        .catch(() => setNotFound(true))
+    } else {
+      if (!cached) {
+        try { cached = JSON.parse(sessionStorage.getItem(cacheKey(orderId))) } catch { /* corrupt cache */ }
+      }
+      // Guests cannot re-auth; only a same-session cached checkout response is usable.
+      if (cached) setOrder(cached)
+      else setNotFound(true)
+    }
+  }, [id, customer, loading, stateOrder])
+
+  if (loading) return <div className="py-24 text-center text-body-md text-ink-muted">{t("Loading...")}</div>
+
+  if (notFound) {
+    return (
+      <div className="py-32 text-center">
+        <span className="material-symbols-outlined text-[56px] text-ink-muted/30 block mb-6">receipt_long</span>
+        <p className="text-body-lg text-ink-muted mb-2">{t("Order not found")}</p>
+        <p className="text-body-md text-ink-muted/70 mb-10">{t("The order may have been removed, or you don't have access to it.")}</p>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          {customer ? (
+            <Link to="/account" className="btn-primary px-10 py-5">{t("Back to My Account")}</Link>
+          ) : (
+            <Link to="/" className="btn-primary px-10 py-5">{t("Back to Home")}</Link>
+          )}
+        </div>
+      </div>
+    )
+  }
+
+  if (!order) return <div className="py-24 text-center text-body-md text-ink-muted">{t("Loading...")}</div>
 
   return (
     <div className="max-w-3xl mx-auto">

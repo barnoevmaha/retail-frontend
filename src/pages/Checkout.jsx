@@ -92,7 +92,7 @@ export default function Checkout() {
         }).catch(() => {})
       }
       refresh()
-      navigate('/order-confirmation', { state: { order: res.data } })
+      navigate(`/order-confirmation/${res.data.id}`, { state: { order: res.data } })
     } catch (err) {
       toast?.addToast(err.response?.data?.detail || t('Checkout failed. Please try again.'), 'error')
       setPlacing(false)
