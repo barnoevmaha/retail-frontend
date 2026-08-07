@@ -25,7 +25,9 @@ export default function MapPicker({ lat, lon, onClose, onPick }) {
 
   const confirm = () => {
     const pos = markerRef.current?.getLatLng()
-    if (pos) onClose && onClose(pos.lat, pos.lng)
+    if (!pos) return
+    if (onPick) onPick(pos.lat, pos.lng)
+    else if (onClose) onClose()
   }
 
   return createPortal(
