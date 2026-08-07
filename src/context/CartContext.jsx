@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import api from '../api/client'
+import { useAuth } from './AuthContext'
 
 const CartContext = createContext(null)
 
@@ -17,6 +18,7 @@ export function CartProvider({ children }) {
   const [subtotal, setSubtotal] = useState(0)
   const [deliveryFee, setDeliveryFee] = useState(0)
   const [total, setTotal] = useState(0)
+  const { customer, loading } = useAuth()
 
   const apply = (r) => {
     setItems(r.data.items || [])
@@ -31,6 +33,10 @@ export function CartProvider({ children }) {
       .catch(() => {})
 
   useEffect(() => { refresh() }, [])
+
+  // After login/logout the authenticated cart changes (server merges the guest cart
+  // into the customer's cart). Re-fetch so the UI reflects the authoritative cart.
+  useEffect(() => { if (!loading) refresh() }, [customer?.id, loading])
 
   const addToCart = async (variantId, quantity = 1) => {
     const r = await api.post('/cart/items', { variant_id: variantId, quantity },
