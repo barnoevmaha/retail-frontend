@@ -14,16 +14,20 @@ function sessionKey() {
 
 export function CartProvider({ children }) {
   const [items, setItems] = useState([])
+  const [subtotal, setSubtotal] = useState(0)
+  const [deliveryFee, setDeliveryFee] = useState(0)
   const [total, setTotal] = useState(0)
 
   const apply = (r) => {
     setItems(r.data.items || [])
-    setTotal(r.data.total || 0)
+    setSubtotal(r.data.subtotal ?? r.data.total ?? 0)
+    setDeliveryFee(r.data.delivery_fee ?? 0)
+    setTotal(r.data.total ?? 0)
   }
 
   const refresh = () =>
     api.get('/cart/', { headers: { 'X-Session-Key': sessionKey() } })
-      .then((r) => { setItems(r.data.items || []); setTotal(r.data.total || 0) })
+      .then(apply)
       .catch(() => {})
 
   useEffect(() => { refresh() }, [])
@@ -49,7 +53,7 @@ export function CartProvider({ children }) {
   const count = items.reduce((s, i) => s + i.quantity, 0)
 
   return (
-    <CartContext.Provider value={{ items, total, count, addToCart, updateQuantity, removeItem, refresh }}>
+    <CartContext.Provider value={{ items, subtotal, deliveryFee, total, count, addToCart, updateQuantity, removeItem, refresh }}>
       {children}
     </CartContext.Provider>
   )

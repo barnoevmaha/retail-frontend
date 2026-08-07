@@ -16,9 +16,6 @@ function sessionKey() {
   return key
 }
 
-const FREE_DELIVERY_OVER = 500
-const DELIVERY_FEE = 10
-
 const inputCls = 'input-line'
 const errCls = 'text-body-sm text-danger mt-1.5'
 
@@ -30,6 +27,8 @@ export default function Checkout() {
   const { customer } = useAuth()
   const [items, setItems] = useState([])
   const [subtotal, setSubtotal] = useState(0)
+  const [deliveryFee, setDeliveryFee] = useState(0)
+  const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
   const [placing, setPlacing] = useState(false)
   const [form, setForm] = useState({ full_name: '', phone: '', city: '', address: '', apartment: '', delivery_note: '', save_address: false, latitude: null, longitude: null })
@@ -40,14 +39,13 @@ export default function Checkout() {
     api.get('/cart/', { headers: { 'X-Session-Key': sessionKey() } })
       .then((r) => {
         setItems(r.data.items || [])
-        setSubtotal(r.data.total || 0)
+        setSubtotal(r.data.subtotal ?? r.data.total ?? 0)
+        setDeliveryFee(r.data.delivery_fee ?? 0)
+        setTotal(r.data.total ?? 0)
       })
       .catch(() => {})
       .finally(() => setLoading(false))
   }, [])
-
-  const deliveryFee = subtotal >= FREE_DELIVERY_OVER ? 0 : DELIVERY_FEE
-  const total = subtotal + deliveryFee
 
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value })
 

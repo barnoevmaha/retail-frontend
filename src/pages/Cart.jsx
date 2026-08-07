@@ -10,7 +10,7 @@ export default function Cart() {
   const toast = useToast()
   const [qtyLoading, setQtyLoading] = useState(null)
   const [checkoutLoading, setCheckoutLoading] = useState(false)
-  const { items, total, updateQuantity, removeItem } = useCart()
+  const { items, subtotal, deliveryFee, total, updateQuantity, removeItem } = useCart()
 
   const changeQty = async (item, qty) => {
     if (qty < 1 || qty === item.quantity || qtyLoading) return
@@ -135,12 +135,15 @@ export default function Cart() {
               <div className="flex flex-col gap-4 text-body-md text-ink mb-8 pb-8 border-b border-border/10">
                 <div className="flex justify-between">
                   <span className="text-ink-muted">{t("Subtotal")}</span>
-                  <span>${total.toFixed(2)}</span>
+                  <span>${subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-ink-muted">{t("Estimated Shipping")}</span>
-                  <span>{t("Complimentary")}</span>
+                  <span className="text-ink-muted">{t("Delivery")}</span>
+                  <span>{deliveryFee === 0 ? t("Complimentary") : `$${deliveryFee.toFixed(2)}`}</span>
                 </div>
+                {deliveryFee > 0 && (
+                  <p className="text-body-xs text-ink-muted">{t("Free delivery on orders over $500")}</p>
+                )}
               </div>
               <div className="flex justify-between items-center mb-8">
                 <span className="font-display text-body-lg text-ink font-medium">{t("Total")}</span>
