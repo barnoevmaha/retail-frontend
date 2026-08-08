@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import api from '../api/client'
 import { useAuth } from '../context/AuthContext'
 import { useI18n } from '../i18n'
-import { orderStatus } from '../utils/orders'
+import { orderStatus, paymentMethodLabel, paymentStatusLabel } from '../utils/orders'
 
 export default function OrderDetails() {
   const { t } = useI18n()
@@ -88,8 +88,8 @@ export default function OrderDetails() {
       <div className="glass-panel rounded-xl p-8 flex flex-col sm:flex-row gap-6 justify-between text-body-md text-ink-muted">
         <div>
           <p className="eyebrow text-ink mb-2">{t("Payment")}</p>
-          <p>{order.payment_method ? String(order.payment_method).toUpperCase() : '—'}</p>
-          <p>{order.payment_status ? orderStatus(order.payment_status, t) : ''}</p>
+          <p>{paymentMethodLabel(order.payment_method, t)}</p>
+          <p>{paymentStatusLabel(order.payment_status, t)}</p>
         </div>
         <div>
           <p className="eyebrow text-ink mb-2">{t("Order Status")}</p>

@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
 import api from '../api/client'
 import { useI18n } from '../i18n'
-import { orderStatus } from '../utils/orders'
+import { orderStatus, paymentStatusLabel } from '../utils/orders'
 
 const inputCls = 'input-line'
 
@@ -236,6 +236,7 @@ export default function Account() {
                     </div>
                     <div className="flex items-center gap-6">
                       <span className="eyebrow text-accent">{orderStatus(o.status, t)}</span>
+                      <span className="eyebrow text-ink-muted">{paymentStatusLabel(o.payment_status, t)}</span>
                       <span className="font-display text-body-md text-ink">${Number(o.total_amount || 0).toFixed(2)}</span>
                       <span className="material-symbols-outlined text-[18px] text-ink-muted">arrow_forward</span>
                     </div>

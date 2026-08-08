@@ -100,7 +100,7 @@ export default function Checkout() {
       const headers = { 'X-Session-Key': sessionKey() }
       if (customer?.id) headers['X-Customer-Id'] = String(customer.id)
       const res = await api.post('/checkout/', {
-        payment_method: 'card',
+        payment_method: 'manual',
         session_key: sessionKey(),
         promo_code: appliedPromo ? appliedPromo.code : null,
         full_name: form.full_name.trim(),
@@ -164,7 +164,7 @@ export default function Checkout() {
   return (
     <div>
       <div className="mb-12 border-b border-border/10 pb-6">
-        <h1 className="font-display text-headline-lg text-ink">{t('Secure Checkout')}</h1>
+        <h1 className="font-display text-headline-lg text-ink">{t('Checkout')}</h1>
         <p className="text-body-md text-ink-muted mt-2">{t('Enter your delivery details and review your order.')}</p>
       </div>
 
@@ -287,9 +287,23 @@ export default function Checkout() {
               <span className="font-display text-body-lg text-ink font-medium">{t('Total')}</span>
               <span className="font-display text-headline-md text-ink">${total.toFixed(2)}</span>
             </div>
+
+            <div className="border border-border/10 rounded-lg p-6 mb-8 bg-surface-muted/40">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="material-symbols-outlined text-[18px] text-ink-muted">payments</span>
+                <h3 className="font-display text-body-lg text-ink">{t('Payment Method')}</h3>
+              </div>
+              <div className="flex items-center gap-3 rounded-lg border border-accent/25 bg-accent/[0.04] px-4 py-3">
+                <span className="material-symbols-outlined text-[20px] text-accent">schedule</span>
+                <div className="text-body-sm text-ink-muted leading-relaxed">
+                  {t('Manual payment: we will contact you to confirm your payment. Online card payment is not currently available.')}
+                </div>
+              </div>
+            </div>
+
             <button className="btn-primary w-full py-5" onClick={placeOrder} disabled={placing}>
               {placing ? t('Placing order…') : t('Place Order')}
-              <span className="material-symbols-outlined text-[20px]">lock</span>
+              <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
             </button>
             <p className="eyebrow text-ink-muted mt-6 text-center leading-relaxed">
               {t('By placing the order, you agree to our Terms of Service and Privacy Policy.')}

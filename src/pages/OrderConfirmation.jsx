@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import api from '../api/client'
 import { useAuth } from '../context/AuthContext'
 import { useI18n } from '../i18n'
-import { orderStatus } from '../utils/orders'
+import { orderStatus, paymentMethodLabel, paymentStatusLabel } from '../utils/orders'
 
 const cacheKey = (id) => `order_conf_${id}`
 
@@ -77,6 +77,13 @@ export default function OrderConfirmation() {
         <p className="text-body-sm text-ink-muted mt-3">
           {order.created_at ? new Date(order.created_at).toLocaleString() : ''}
         </p>
+        <div className="mt-8 inline-flex items-center gap-3 rounded-xl border border-accent/25 bg-accent/[0.04] px-6 py-4 text-body-sm text-ink-muted text-left">
+          <span className="material-symbols-outlined text-[22px] text-accent shrink-0">payments</span>
+          <span className="leading-relaxed">
+            <strong className="text-ink">{t('Payment method')}:</strong> {paymentMethodLabel(order.payment_method, t)} · {paymentStatusLabel(order.payment_status, t)}<br />
+            {t('Online card payment is not currently available. We will contact you to confirm payment before your order is shipped.')}
+          </span>
+        </div>
       </div>
 
       <div className="glass-panel rounded-xl p-8 mb-10">
