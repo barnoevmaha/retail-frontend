@@ -17,6 +17,7 @@ export default function Product() {
   const { faves, toggle: toggleFav } = useFavorites()
   const toast = useToast()
   const [product, setProduct] = useState(null)
+  const [failed, setFailed] = useState(false)
   const [color, setColor] = useState(null)
   const [size, setSize] = useState(null)
   const [imgIdx, setImgIdx] = useState(0)
@@ -32,19 +33,33 @@ export default function Product() {
   const colorOf = (v) => v && (v.color_name || v.color || null)
 
   useEffect(() => {
+    setFailed(false)
+    setProduct(null)
     api.get(`/products/${slug}`).then((r) => {
       setProduct(r.data)
       const v = r.data.variants?.[0] || null
       setColor(colorOf(v))
       setSize(v?.size || null)
-    }).catch(() => {})
+    }).catch(() => setFailed(true))
   }, [slug])
+
+  if (failed) {
+    return (
+      <div className="py-32 text-center">
+        <span className="material-symbols-outlined text-[56px] text-ink-muted/30 block mb-6">inventory_2</span>
+        <p className="text-body-lg text-ink-muted mb-2">{t("Product not found")}</p>
+        <p className="text-body-md text-ink-muted/70 mb-10">{t("The product you're looking for may have been removed or is no longer available.")}</p>
+        <Link to="/catalog" className="btn-primary px-10 py-5">{t("Back to Catalog")}</Link>
+      </div>
+    )
+  }
 
   if (!product) {
     return <div className="py-24 text-center text-body-md text-ink-muted">{t("Loading...")}</div>
   }
 
   const colors = [...new Set(product.variants.map(colorOf).filter(Boolean))]
+  const sizes = [...new Set(product.variants.map((v) => v.size).filter(Boolean))]
   const variant = product.variants.find((v) => colorOf(v) === color && v.size === size)
     || product.variants.find((v) => colorOf(v) === color)
     || product.variants.find((v) => v.size === size)
@@ -195,7 +210,7 @@ export default function Product() {
             )}
 
             {/* Size / variant selection */}
-            {product.variants?.length > 0 && (
+            {sizes.length > 0 && (
               <div className="flex flex-col gap-4">
                 <span className="eyebrow text-ink">{t("Select Size")}</span>
                 <button
@@ -233,7 +248,7 @@ export default function Product() {
                   <div className="mx-6 md:mx-8 border-t border-border/10" />
                   <div className="flex-1 overflow-y-auto px-6 md:px-8 py-6">
                     <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5">
-                      {[...new Set(product.variants.map((v) => v.size))].map((s) => {
+                      {sizes.map((s) => {
                         const v = product.variants.find((x) => colorOf(x) === color && x.size === s)
                         const available = !!v && v.quantity > 0
                         return (

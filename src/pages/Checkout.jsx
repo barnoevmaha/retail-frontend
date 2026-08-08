@@ -6,15 +6,7 @@ import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
 import { useI18n } from '../i18n'
 import MapPicker from '../components/MapPicker'
-
-function sessionKey() {
-  let key = sessionStorage.getItem('session_key')
-  if (!key) {
-    key = 'guest_' + Math.random().toString(36).slice(2)
-    sessionStorage.setItem('session_key', key)
-  }
-  return key
-}
+import { sessionKey } from '../utils/session'
 
 const inputCls = 'input-line'
 const errCls = 'text-body-sm text-danger mt-1.5'
@@ -30,6 +22,7 @@ export default function Checkout() {
   const [deliveryFee, setDeliveryFee] = useState(0)
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState(false)
   const [placing, setPlacing] = useState(false)
   const [promoCode, setPromoCode] = useState('')
   const [appliedPromo, setAppliedPromo] = useState(null)
@@ -46,7 +39,7 @@ export default function Checkout() {
         setDeliveryFee(r.data.delivery_fee ?? 0)
         setTotal(r.data.total ?? 0)
       })
-      .catch(() => {})
+      .catch(() => setLoadError(true))
       .finally(() => setLoading(false))
   }, [])
 
@@ -85,7 +78,7 @@ export default function Checkout() {
   const validate = () => {
     const e = {}
     if (!form.full_name.trim()) e.full_name = t('Full name is required')
-    if (!/^\+?[\d\s()-]{7,20}$/.test(form.phone.trim())) e.phone = t('Enter a valid phone number')
+    if (!/^\+?[\d\s()-]{7,20}$/.test(form.phone.trim()) || (form.phone.match(/\d/g) || []).length < 4) e.phone = t('Enter a valid phone number')
     if (!form.city.trim()) e.city = t('City is required')
     if (!form.address.trim()) e.address = t('Address is required')
     setErrors(e)
@@ -151,6 +144,16 @@ export default function Checkout() {
     return <div className="py-24 text-center text-body-md text-ink-muted">{t('Loading...')}</div>
   }
 
+  if (loadError) {
+    return (
+      <div className="py-32 text-center">
+        <span className="material-symbols-outlined text-[56px] text-ink-muted/30 block mb-6">error_outline</span>
+        <p className="text-body-lg text-ink-muted mb-10">{t('Could not load your cart. Please try again.')}</p>
+        <button onClick={() => window.location.reload()} className="btn-primary">{t('Retry')}</button>
+      </div>
+    )
+  }
+
   if (items.length === 0) {
     return (
       <div className="py-32 text-center">
@@ -201,7 +204,7 @@ export default function Checkout() {
                 </button>
               </div>
               {errors.address && <p className={errCls}>{errors.address}</p>}
-              {form.latitude && form.longitude && (
+              {form.latitude != null && form.longitude != null && (
                 <p className="text-body-xs text-ink-muted mt-1.5 flex items-center gap-1.5">
                   <span className="material-symbols-outlined text-[14px]">my_location</span>
                   Pin: {form.latitude.toFixed(5)}, {form.longitude.toFixed(5)}

@@ -23,7 +23,7 @@ export default function Login() {
     try {
       const res = await api.post('/customer/auth/login', { login, password })
       authLogin(res.data.access_token, res.data.customer, res.data.refresh_token)
-      toast?.addToast('Welcome back!', 'success')
+      toast?.addToast(t('Welcome back!'), 'success')
       navigate('/')
     } catch (err) {
       if (err.response?.status === 423) {

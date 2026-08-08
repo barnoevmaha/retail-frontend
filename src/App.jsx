@@ -45,7 +45,7 @@ function Footer() {
           <Link to="/register" className="text-body-md text-ink-muted hover:text-ink transition-colors duration-300">{t("Create Account")}</Link>
         </div>
         <div className="md:col-span-4 mt-8 pt-8 border-t border-border/10">
-          <p className="text-label-sm text-ink-muted tracking-widest uppercase">© 2024 Aurelius Monochrome. {t("All rights reserved.")}</p>
+          <p className="text-label-sm text-ink-muted tracking-widest uppercase">© {new Date().getFullYear()} Aurelius Monochrome. {t("All rights reserved.")}</p>
         </div>
       </div>
     </footer>

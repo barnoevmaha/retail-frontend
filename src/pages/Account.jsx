@@ -20,6 +20,8 @@ export default function Account() {
   const [addresses, setAddresses] = useState([])
   const [orders, setOrders] = useState([])
   const [ordersLoading, setOrdersLoading] = useState(false)
+  const [ordersError, setOrdersError] = useState(false)
+  const [ordersRetry, setOrdersRetry] = useState(0)
   const [addressForm, setAddressForm] = useState({ receiver_name: '', receiver_phone: '', country: '', city: '', street: '', house: '', apartment: '', postal_code: '', is_default_shipping: false, is_default_billing: false })
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
@@ -79,8 +81,9 @@ export default function Account() {
   useEffect(() => {
     if (tab !== 'orders' || !customer) return
     setOrdersLoading(true)
-    api.get('/customer/orders/').then((r) => setOrders(r.data || [])).catch(() => {}).finally(() => setOrdersLoading(false))
-  }, [tab, customer])
+    setOrdersError(false)
+    api.get('/customer/orders/').then((r) => setOrders(r.data || [])).catch(() => setOrdersError(true)).finally(() => setOrdersLoading(false))
+  }, [tab, customer, ordersRetry])
 
   return (
     <div className="flex flex-col md:flex-row gap-gutter">
@@ -210,6 +213,13 @@ export default function Account() {
           <div>
             {ordersLoading ? (
               <p className="py-16 text-center text-body-md text-ink-muted">{t("Loading...")}</p>
+            ) : ordersError ? (
+              <div className="py-24 text-center">
+                <span className="material-symbols-outlined text-[56px] text-ink-muted/30 block mb-6">error_outline</span>
+                <p className="text-body-lg text-ink-muted mb-6">{t("Could not load your orders. Please try again.")}</p>
+                <p className="text-body-md text-ink-muted/70 mb-10">{t("Check your connection and try again.")}</p>
+                <button onClick={() => setOrdersRetry((n) => n + 1)} className="btn-primary">{t("Retry")}</button>
+              </div>
             ) : orders.length === 0 ? (
               <div className="py-24 text-center">
                 <span className="material-symbols-outlined text-[56px] text-ink-muted/30 block mb-6">receipt_long</span>

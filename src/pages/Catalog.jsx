@@ -84,6 +84,7 @@ export default function Catalog() {
   const [products, setProducts] = useState([])
   const [categories, setCategories] = useState([])
   const [selectedCat, setSelectedCat] = useState('')
+  const [loaded, setLoaded] = useState(false)
 
   const catLabel = (c) => {
     const tr = t(`category.${c.slug}`)
@@ -92,7 +93,7 @@ export default function Catalog() {
 
   useEffect(() => {
     api.get('/products/').then((r) => setProducts(r.data.items || [])).catch(() => {})
-    api.get('/categories/').then((r) => setCategories(r.data || [])).catch(() => {})
+    api.get('/categories/').then((r) => setCategories(r.data || [])).catch(() => {}).finally(() => setLoaded(true))
   }, [])
 
   const prodCatLabel = (p) => p.category_slug
@@ -131,14 +132,14 @@ export default function Catalog() {
       </div>
 
       {/* Product grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-x-gutter gap-y-16">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-x-gutter gap-y-16">
         {filtered.map((p) => (
           <ProductCard key={p.id} p={p} label={prodCatLabel(p)} />
         ))}
       </div>
 
-      {filtered.length === 0 && (
-        <p className="text-body-md text-ink-muted py-24 text-center">{t("Your cart is empty")}</p>
+      {loaded && filtered.length === 0 && (
+        <p className="text-body-md text-ink-muted py-24 text-center">{t("No products found")}</p>
       )}
     </div>
   )
