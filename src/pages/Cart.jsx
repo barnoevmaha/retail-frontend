@@ -158,11 +158,11 @@ export default function Cart() {
                 onClick={goCheckout}
                 disabled={checkoutLoading}
               >
-                {t("Proceed to Secure Checkout")}
-                <span className="material-symbols-outlined text-[20px]">lock</span>
+                {t("Proceed to Checkout")}
+                <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
               </button>
               <p className="eyebrow text-ink-muted mt-6 text-center leading-relaxed">
-                {t("By proceeding, you agree to our Terms of Service and Privacy Policy. Secure, encrypted transaction.")}
+                {t("By proceeding, you agree to our Terms of Service and Privacy Policy.")}
               </p>
             </div>
           </aside>
