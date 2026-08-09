@@ -3,14 +3,11 @@ import api from './api/client'
 
 const STORAGE_KEY = 'lang'
 const CACHE_KEY = 'translations_v2'
-const FLUSH_DELAY = 400
 
 let lang = localStorage.getItem(STORAGE_KEY) || 'en'
 let translations = {}
 let version = 0
 const listeners = new Set()
-const pending = new Set()
-let flushTimer = null
 
 function emit() {
   version++
@@ -56,28 +53,9 @@ function merge(map) {
   return changed
 }
 
-async function flush() {
-  flushTimer = null
-  const texts = [...pending]
-  pending.clear()
-  if (!texts.length) return
-  try {
-    const res = await api.post('/translations/sync', { texts })
-    if (merge(res.data?.translations || {})) emit()
-  } catch {
-    /* backend unreachable — keep English until next attempt */
-  }
-}
-
-function queueSync(key) {
-  pending.add(key)
-  if (!flushTimer) flushTimer = setTimeout(flush, FLUSH_DELAY)
-}
-
 function translate(key, params) {
   const entry = translations[key]
   const text = entry?.[lang] || key
-  if (!entry) queueSync(key)
   return applyParams(text, params)
 }
 
