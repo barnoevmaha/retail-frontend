@@ -71,7 +71,7 @@ export default function Product() {
     setImgIdx(0)
     Promise.all([
       api.get(`/products/${slug}`),
-      colorCache.p ? Promise.resolve({ data: colorCache.p }) : api.get('/colors'),
+      colorCache.p ? Promise.resolve({ data: colorCache.p }) : api.get('/colors/'),
     ]).then(([pr, cr]) => {
       if (!alive) return
       colorCache.p = cr.data || []
