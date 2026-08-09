@@ -6,6 +6,33 @@ import { useFavorites } from '../context/FavoritesContext'
 import { useToast } from '../context/ToastContext'
 import { useI18n } from '../i18n'
 
+const norm = (s) => (s || '').trim().toLowerCase()
+
+// ponytail: resolved once per page load — the colors table is tiny and maps
+// variant.color_id / free-text color name to the real name+hex from the backend.
+let colorListCache = null
+const getColorList = () => {
+  if (!colorListCache) {
+    colorListCache = api.get('/colors/').then((r) => r.data || []).catch(() => [])
+  }
+  return colorListCache
+}
+
+const swatchOf = (v, colorList) => {
+  if (v.color_id != null) {
+    const hit = colorList.find((c) => c.id === v.color_id)
+    if (hit) return { key: `cid:${hit.id}`, name: hit.name || v.color_name || v.color, id: hit.id, hex: hit.hex_value || v.color_hex }
+    if (v.color_hex) return { key: `cid:${v.color_id}`, name: v.color_name || v.color, id: v.color_id, hex: v.color_hex }
+  }
+  const name = v.color_name || v.color
+  if (name) {
+    const hit = colorList.find((c) => norm(c.name) === norm(name))
+    if (hit) return { key: `cid:${hit.id}`, name: hit.name, id: hit.id, hex: hit.hex_value || v.color_hex }
+    if (v.color_hex) return { key: 'name:' + norm(name), name, id: null, hex: v.color_hex }
+  }
+  return null
+}
+
 const ProductCard = ({ p, label }) => {
   const { t } = useI18n()
   const navigate = useNavigate()
@@ -13,6 +40,9 @@ const ProductCard = ({ p, label }) => {
   const { customer } = useAuth()
   const { faves, toggle: toggleFav } = useFavorites()
   const [hoverColorId, setHoverColorId] = useState(null)
+  const [colorList, setColorList] = useState([])
+
+  useEffect(() => { getColorList().then(setColorList) }, [])
 
   const handleFav = async (e) => {
     e.preventDefault()
@@ -21,8 +51,11 @@ const ProductCard = ({ p, label }) => {
     toast?.addToast(ok ? (faves.has(p.id) ? t("Removed from favorites") : t("Added to favorites")) : t("Something went wrong"), ok ? 'success' : 'error')
   }
 
-  const colors = [...new Map(p.variants.filter((v) => v.color_name || v.color).map((v) => [v.color_name || v.color, v])).values()]
-    .map((v) => ({ name: v.color_name || v.color, id: v.color_id, hex: v.color_hex }))
+  const seen = new Set()
+  const colors = (p.variants || [])
+    .filter((v) => v.is_active !== false)
+    .map((v) => swatchOf(v, colorList))
+    .filter((c) => c && c.hex && !seen.has(c.key) && seen.add(c.key))
   const img = p.images?.find((i) => hoverColorId && i.color_id === hoverColorId)?.image_url
     || p.images?.[0]?.image_url
     || p.image_url
@@ -62,7 +95,7 @@ const ProductCard = ({ p, label }) => {
                     onMouseLeave={() => setHoverColorId(null)}
                     title={c.name}
                     className={`w-6 h-6 rounded-full border border-black/15 transition-transform ${hoverColorId === c.id ? 'scale-110 border-ink' : ''}`}
-                    style={{ background: c.hex || 'linear-gradient(135deg,#e5e5e5 50%,#d4d4d4 50%)' }}
+                    style={{ backgroundColor: c.hex }}
                   />
                 ))}
               </div>
